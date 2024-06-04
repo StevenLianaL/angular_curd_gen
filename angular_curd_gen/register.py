@@ -1,0 +1,135 @@
+from dataclasses import dataclass
+from pathlib import Path
+
+from jinja2 import FileSystemLoader, Environment
+from parse import parse
+from pydantic import BaseModel
+
+from angular_curd_gen.config import TEMPLATE_DIR
+
+
+class ModelAdmin:
+    model_fields = ()  # base fields for model
+    list_display_restraint = ()  # show in list page, only restraint, not need interface
+    list_editable_restraint = ()  # can edit in list page, only restraint, not need interface
+    model_edit_fields = ()  # can edit in detail page
+    model_create_fields = ()  # can create in create page
+
+
+@dataclass
+class ModelRegister:
+    """"""
+    model_admin: ModelAdmin = None
+    model: BaseModel = None
+
+    # extract model info
+    model_name = ''
+    lower_model_name = ''
+    model_fields_map = None  # all model fields with type dict[str,type]
+    jinja_env = None
+    output_model_dir = ''
+
+    # extract model admin info
+    model_admin_fields = ()
+
+    def register(self):
+        """run all"""
+        self._prepare()
+        gen_functions = [i for i in dir(self) if i.startswith('gen_')]
+        for f in gen_functions:
+            getattr(self, f)()
+
+    def _prepare(self):
+        # model
+        self.model_name = self.model.__name__
+        self.lower_model_name = self.model_name.lower()
+        self.model_fields_map = self.model.__dict__['__annotations__']
+
+        # model admin
+        self.model_admin_fields = tuple([i for i in dir(self.model_admin) if not i.startswith('_')])
+
+        # template
+        loader = FileSystemLoader(TEMPLATE_DIR)
+        self.jinja_env = Environment(loader=loader)
+        self.output_model_dir = Path(f"output/{self.model_name}")
+        self.output_model_dir.mkdir(parents=True, exist_ok=True)
+
+    def _load_template(self, name: str):
+        return self.jinja_env.get_template(name)
+
+    def gen_a_interface(self):
+        template_name = 'interfaces.jinja'
+        template = self._load_template(template_name)
+        context = self._build_context()
+
+        # 渲染模板
+        rendered_content = template.render(context)
+        output_file = self.output_model_dir / f"{self.lower_model_name}_{template_name.split('.')[0]}.ts"
+        with output_file.open('w') as file:
+            file.write(rendered_content)
+
+    def gen_b_api(self):
+        template_name = 'apis.jinja'
+        template = self._load_template(template_name)
+        context = self._build_context()
+        rendered_content = template.render(context)
+        output_file = self.output_model_dir / f"{self.lower_model_name}_api.service.ts"
+        with output_file.open('w') as file:
+            file.write(rendered_content)
+
+    def gen_c_list(self):
+        print('gen_c_list')
+        pass
+
+    def gen_d_create(self):
+        print('gen_d_create')
+        pass
+
+    def gen_e_update(self):
+        print('gen_e_update')
+        pass
+
+    def gen_f_router(self):
+        print('gen_f_router')
+        pass
+
+    @staticmethod
+    def map_ts_type(t):
+        type_str = parse("<class '{type}'>", str(t))
+        if not type_str:  # option
+            type_str = parse("typing.Optional[{type}]", str(t))
+
+        the_type = type_str.named['type']
+
+        match the_type:
+            case 'int':
+                return 'number'
+            case 'str':
+                return 'string'
+            case 'bool':
+                return 'boolean'
+            case 'float':
+                return 'number'
+            case 'datetime.datetime':
+                return 'Date'
+            case _:
+                raise ValueError(f"not support type {t}")
+
+    def _build_context(self) -> dict:
+        base_context = {
+            'model_name': self.model_name,
+            'lower_model_name': self.lower_model_name,
+            'fields_map': self.model_fields_map,
+            'cls': self
+        }
+        model_admin_context = {}
+        for k in self.model_admin_fields:
+            if k.endswith('_fields'):
+                k_value = getattr(self.model_admin, k)
+                print(f"{k=} {k_value=}")
+                model_admin_context[f"{k}_map"] = {k1: v1 for k1, v1 in self.model_fields_map.items() if
+                                                   k1 in k_value}
+
+        context = base_context | model_admin_context
+        print(context)
+        return context
