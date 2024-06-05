@@ -1,0 +1,25 @@
+{% set service_name = model_name+'Service' -%}
+import {Component, OnInit} from '@angular/core';
+import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
+import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
+
+@Component({
+  selector: 'app-{{ lower_model_name }}-list',
+  templateUrl: './{{ lower_model_name }}-list.component.html',
+  styleUrls: ['./{{ lower_model_name }}-list.component.css']
+})
+export class {{ model_name }}ListComponent implements OnInit {
+  {{ models_name }}List: {{ model_name }}[];
+
+  constructor(
+    private api: {{ service_name }},
+  ) {}
+
+  ngOnInit(): void {
+    this.api.getAll{{ models_name }}().subscribe(
+      r => {
+        this.{{ models_name }}List = r;
+      }
+    );
+  }
+}

@@ -6,15 +6,8 @@ from jinja2 import FileSystemLoader, Environment
 from parse import parse
 from pydantic import BaseModel
 
+from angular_curd_gen.admin import ModelAdmin
 from angular_curd_gen.config import TEMPLATE_DIR
-
-
-class ModelAdmin:
-    model_fields = ()  # base fields for model
-    list_display_restraint = ()  # show in list page, only restraint, not need interface
-    list_editable_restraint = ()  # can edit in list page, only restraint, not need interface
-    model_edit_fields = ()  # can edit in detail page
-    model_create_fields = ()  # can create in create page
 
 
 @dataclass
@@ -50,8 +43,6 @@ class ModelRegister:
         self.model_name = engine.singular_noun(self.model.__name__) or self.model.__name__
         self.models_name = engine.plural(self.model_name)
 
-        print(f"{self.model_name=} {self.models_name=}")
-
         self.lower_model_name = self.model_name.lower()
         self.lower_models_name = self.models_name.lower()
 
@@ -63,7 +54,7 @@ class ModelRegister:
         # template
         loader = FileSystemLoader(TEMPLATE_DIR)
         self.jinja_env = Environment(loader=loader)
-        self.output_model_dir = Path(f"output/{self.model_name}")
+        self.output_model_dir = Path(f"{self.app_name}/{self.model_name}")
         self.output_model_dir.mkdir(parents=True, exist_ok=True)
 
     def _load_template(self, name: str):
@@ -85,8 +76,13 @@ class ModelRegister:
         self._draw_template(template_name=template, target=target)
 
     def gen_c_list(self):
-        print('gen_c_list')
-        pass
+        templates = ['ts', 'css', 'html', 'spec.ts']
+        for template in templates:
+            template_name = f'list_component/{template}.jinja'
+            target_prefix = f"{self.lower_model_name}-list"
+            (self.output_model_dir / target_prefix).mkdir(parents=True, exist_ok=True)
+            target = f"{target_prefix}/{target_prefix}.component.{template}"
+            self._draw_template(template_name=template_name, target=target)
 
     def gen_d_create(self):
         print('gen_d_create')
@@ -105,7 +101,7 @@ class ModelRegister:
         context = self._build_context()
         rendered_content = template.render(context)
         output_file = self.output_model_dir / target
-        with output_file.open('w') as file:
+        with output_file.open('w', encoding='utf8') as file:
             file.write(rendered_content)
 
     @staticmethod
@@ -138,16 +134,19 @@ class ModelRegister:
             'lower_models_name': self.lower_models_name,
             'lower_model_name': self.lower_model_name,
             'fields_map': self.model_fields_map,
+            'fields_translate_map': dict(zip(self.model_admin.model_fields, self.model_admin.model_translate_fields)),
             'cls': self
         }
         model_admin_context = {}
         for k in self.model_admin_fields:
+            k_value = getattr(self.model_admin, k)
+            model_admin_context[k] = k_value
+
             if k.endswith('_fields'):
-                k_value = getattr(self.model_admin, k)
-                print(f"{k=} {k_value=}")
-                model_admin_context[f"{k}_map"] = {k1: v1 for k1, v1 in self.model_fields_map.items() if
-                                                   k1 in k_value}
+                model_admin_context[f"{k}_type_map"] = {k1: v1 for k1, v1 in self.model_fields_map.items() if
+                                                        k1 in k_value}
+            if k.endswith('_restraint'):
+                model_admin_context[f"{k}_translate"] = {base_context['fields_translate_map'][v] for v in k_value}
 
         context = base_context | model_admin_context
-        print(context)
         return context

@@ -1,0 +1,24 @@
+{% set model_list = model_name+'List' -%}
+{% set table_name = lower_model_name+'Table' -%}
+{% set left = '{{' -%}
+{% set right = '}}' -%}
+<div *ngIf="{{ model_list }}">
+    <nz-table #table_name [nzData]="{{ model_list }}">
+      <thead>
+        <tr>
+            {% for tf in list_display_restraint_translate -%}
+                <th>{{ tf }}</th>
+            {% endfor -%}
+            <td>action</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of {{ table_name }}.data">
+            {% for ldf in list_display_restraint -%}
+                <td>{{ left }}data.{{ ldf }}{{ right }}</td>
+            {% endfor -%}
+            <td>action</td>
+        </tr>
+      </tbody>
+    </nz-table>
+</div>
