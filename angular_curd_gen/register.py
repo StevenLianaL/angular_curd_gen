@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+import inflect
 from jinja2 import FileSystemLoader, Environment
 from parse import parse
 from pydantic import BaseModel
@@ -21,10 +22,13 @@ class ModelRegister:
     """"""
     model_admin: ModelAdmin = None
     model: BaseModel = None
+    app_name: str = ''  # app name
 
     # extract model info
-    model_name = ''
+    model_name = ''  # is single
+    models_name = ''  # is plural
     lower_model_name = ''
+    lower_models_name = ''
     model_fields_map = None  # all model fields with type dict[str,type]
     jinja_env = None
     output_model_dir = ''
@@ -41,8 +45,16 @@ class ModelRegister:
 
     def _prepare(self):
         # model
-        self.model_name = self.model.__name__
+        engine = inflect.engine()
+
+        self.model_name = engine.singular_noun(self.model.__name__) or self.model.__name__
+        self.models_name = engine.plural(self.model_name)
+
+        print(f"{self.model_name=} {self.models_name=}")
+
         self.lower_model_name = self.model_name.lower()
+        self.lower_models_name = self.models_name.lower()
+
         self.model_fields_map = self.model.__dict__['__annotations__']
 
         # model admin
@@ -69,7 +81,7 @@ class ModelRegister:
             file.write(rendered_content)
 
     def gen_b_api(self):
-        template_name = 'apis.jinja'
+        template_name = 'api.jinja'
         template = self._load_template(template_name)
         context = self._build_context()
         rendered_content = template.render(context)
@@ -117,7 +129,10 @@ class ModelRegister:
 
     def _build_context(self) -> dict:
         base_context = {
+            'app_name': self.app_name,
             'model_name': self.model_name,
+            'models_name': self.models_name,
+            'lower_models_name': self.lower_models_name,
             'lower_model_name': self.lower_model_name,
             'fields_map': self.model_fields_map,
             'cls': self

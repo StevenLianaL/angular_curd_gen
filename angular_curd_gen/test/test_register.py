@@ -33,5 +33,5 @@ class UsersAdmin(ModelAdmin):
 
 
 def test_register():
-    mr = ModelRegister(model_admin=UsersAdmin, model=Users)
+    mr = ModelRegister(model_admin=UsersAdmin, model=Users, app_name='first')
     mr.register()
