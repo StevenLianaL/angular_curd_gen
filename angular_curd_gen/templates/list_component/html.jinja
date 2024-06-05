@@ -1,9 +1,9 @@
-{% set model_list = model_name+'List' -%}
+{% set model_list = models_name+'List' -%}
 {% set table_name = lower_model_name+'Table' -%}
 {% set left = '{{' -%}
 {% set right = '}}' -%}
 <div *ngIf="{{ model_list }}">
-    <nz-table #table_name [nzData]="{{ model_list }}">
+    <nz-table #{{ table_name }} [nzData]="{{ model_list }}">
       <thead>
         <tr>
             {% for tf in list_display_restraint_translate -%}

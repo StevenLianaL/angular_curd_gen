@@ -50,6 +50,8 @@ class ModelRegister:
 
         # model admin
         self.model_admin_fields = tuple([i for i in dir(self.model_admin) if not i.startswith('_')])
+        if not self.model_admin.model_translate_fields:
+            self.model_admin.model_translate_fields = self.model_admin.model_fields
 
         # template
         loader = FileSystemLoader(TEMPLATE_DIR)
@@ -146,7 +148,7 @@ class ModelRegister:
                 model_admin_context[f"{k}_type_map"] = {k1: v1 for k1, v1 in self.model_fields_map.items() if
                                                         k1 in k_value}
             if k.endswith('_restraint'):
-                model_admin_context[f"{k}_translate"] = {base_context['fields_translate_map'][v] for v in k_value}
+                model_admin_context[f"{k}_translate"] = [base_context['fields_translate_map'][v] for v in k_value]
 
         context = base_context | model_admin_context
         return context
