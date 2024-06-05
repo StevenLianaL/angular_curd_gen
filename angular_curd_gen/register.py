@@ -26,7 +26,7 @@ class ModelRegister:
     lower_models_name = ''
     model_fields_map = None  # all model fields with type dict[str,type]
     jinja_env = None
-    output_model_dir = ''
+    output_app_dir = ''
 
     # extract model admin info
     model_admin_fields = ()
@@ -60,25 +60,26 @@ class ModelRegister:
         # template
         loader = FileSystemLoader(TEMPLATE_DIR)
         self.jinja_env = Environment(loader=loader)
-        self.output_model_dir = Path(f"{self.app_name}/{self.model_name}")
-        self.output_model_dir.mkdir(parents=True, exist_ok=True)
+        self.output_app_dir = Path(f"{self.app_name}")
+        self.output_app_dir.mkdir(parents=True, exist_ok=True)
+        (self.output_app_dir / self.model_name).mkdir(parents=True, exist_ok=True)
 
     def _load_template(self, name: str):
         return self.jinja_env.get_template(name)
 
     def gen_a_interface(self):
         template = 'interfaces.jinja'
-        target = f"{self.lower_model_name}_interfaces.ts"
+        target = f"{self.model_name}/{self.lower_model_name}_interfaces.ts"
         self._draw_template(template_name=template, target=target)
 
     def gen_b_api(self):
         template = 'api.jinja'
-        target = f"{self.lower_model_name}_api.service.ts"
+        target = f"{self.model_name}/{self.lower_model_name}_api.service.ts"
         self._draw_template(template_name=template, target=target)
 
     def gen_b1_api_spec(self):
         template = 'api.spec.jinja'
-        target = f"{self.lower_model_name}_api.service.spec.ts"
+        target = f"{self.model_name}/{self.lower_model_name}_api.service.spec.ts"
         self._draw_template(template_name=template, target=target)
 
     def gen_c_module(self):
@@ -86,32 +87,34 @@ class ModelRegister:
         target = f"{self.app_name}.module.ts"
         self._draw_template(template_name=template, target=target)
 
-    def gen_d_list(self):
+    def gen_d_router(self):
+        template = 'routers.jinja'
+        target = f"{self.app_name}-routing.module.ts"
+        self._draw_template(template_name=template, target=target)
+
+    def gen_e_list(self):
         templates = ['ts', 'css', 'html', 'spec.ts']
         for template in templates:
             template_name = f'list_component/{template}.jinja'
             target_prefix = f"{self.lower_model_name}-list"
-            (self.output_model_dir / target_prefix).mkdir(parents=True, exist_ok=True)
-            target = f"{target_prefix}/{target_prefix}.component.{template}"
+            (self.output_app_dir / self.model_name / target_prefix).mkdir(parents=True, exist_ok=True)
+            target = f"{self.model_name}/{target_prefix}/{target_prefix}.component.{template}"
             self._draw_template(template_name=template_name, target=target)
 
-    def gen_e_create(self):
+    def gen_f_create(self):
         print('gen_d_create')
         pass
 
-    def gen_f_update(self):
+    def gen_g_update(self):
         print('gen_e_update')
-        pass
-
-    def gen_g_router(self):
-        print('gen_f_router')
         pass
 
     def _draw_template(self, template_name: str, target: str):
         template = self._load_template(template_name)
         context = self._build_context()
         rendered_content = template.render(context)
-        output_file = self.output_model_dir / target
+        output_file = self.output_app_dir / target
+
         with output_file.open('w', encoding='utf8') as file:
             file.write(rendered_content)
 

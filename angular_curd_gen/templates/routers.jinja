@@ -1,0 +1,16 @@
+{% set list_component_name = model_name+'ListComponent' -%}
+
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import { {{ list_component_name }} } from "./{{ model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
+
+const routes: Routes = [
+  {path: '{{ lower_models_name }}', component: {{ list_component_name }}}
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class {{ app_title_name }}RoutingModule {
+}
