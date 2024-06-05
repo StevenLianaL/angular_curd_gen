@@ -1,0 +1,21 @@
+{% set list_component_name = model_name+'ListComponent' -%}
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+
+import { {{ app_title_name }}RoutingModule} from './{{ app_name }}-routing.module';
+import { {{ list_component_name }}} from "./{{ model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
+import {NzTableModule} from "ng-zorro-antd/table";
+
+
+@NgModule({
+  declarations: [
+    {{ list_component_name }}
+  ],
+  imports: [
+    CommonModule,
+    NzTableModule,
+    {{ app_title_name }}RoutingModule,
+  ]
+})
+export class FirstModule {
+}

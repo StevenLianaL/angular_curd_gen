@@ -15,7 +15,9 @@ class ModelRegister:
     """"""
     model_admin: ModelAdmin = None
     model: BaseModel = None
+
     app_name: str = ''  # app name
+    app_title_name = ''
 
     # extract model info
     model_name = ''  # is single
@@ -39,6 +41,8 @@ class ModelRegister:
     def _prepare(self):
         # model
         engine = inflect.engine()
+
+        self.app_title_name = self.app_name.title()
 
         self.model_name = engine.singular_noun(self.model.__name__) or self.model.__name__
         self.models_name = engine.plural(self.model_name)
@@ -77,7 +81,12 @@ class ModelRegister:
         target = f"{self.lower_model_name}_api.service.spec.ts"
         self._draw_template(template_name=template, target=target)
 
-    def gen_c_list(self):
+    def gen_c_module(self):
+        template = 'module.jinja'
+        target = f"{self.app_name}.module.ts"
+        self._draw_template(template_name=template, target=target)
+
+    def gen_d_list(self):
         templates = ['ts', 'css', 'html', 'spec.ts']
         for template in templates:
             template_name = f'list_component/{template}.jinja'
@@ -86,15 +95,15 @@ class ModelRegister:
             target = f"{target_prefix}/{target_prefix}.component.{template}"
             self._draw_template(template_name=template_name, target=target)
 
-    def gen_d_create(self):
+    def gen_e_create(self):
         print('gen_d_create')
         pass
 
-    def gen_e_update(self):
+    def gen_f_update(self):
         print('gen_e_update')
         pass
 
-    def gen_f_router(self):
+    def gen_g_router(self):
         print('gen_f_router')
         pass
 
@@ -131,6 +140,7 @@ class ModelRegister:
     def _build_context(self) -> dict:
         base_context = {
             'app_name': self.app_name,
+            'app_title_name': self.app_title_name,
             'model_name': self.model_name,
             'models_name': self.models_name,
             'lower_models_name': self.lower_models_name,
