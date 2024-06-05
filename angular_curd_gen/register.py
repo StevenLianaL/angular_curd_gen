@@ -70,24 +70,19 @@ class ModelRegister:
         return self.jinja_env.get_template(name)
 
     def gen_a_interface(self):
-        template_name = 'interfaces.jinja'
-        template = self._load_template(template_name)
-        context = self._build_context()
-
-        # 渲染模板
-        rendered_content = template.render(context)
-        output_file = self.output_model_dir / f"{self.lower_model_name}_{template_name.split('.')[0]}.ts"
-        with output_file.open('w') as file:
-            file.write(rendered_content)
+        template = 'interfaces.jinja'
+        target = f"{self.lower_model_name}_interfaces.ts"
+        self._draw_template(template_name=template, target=target)
 
     def gen_b_api(self):
-        template_name = 'api.jinja'
-        template = self._load_template(template_name)
-        context = self._build_context()
-        rendered_content = template.render(context)
-        output_file = self.output_model_dir / f"{self.lower_model_name}_api.service.ts"
-        with output_file.open('w') as file:
-            file.write(rendered_content)
+        template = 'api.jinja'
+        target = f"{self.lower_model_name}_api.service.ts"
+        self._draw_template(template_name=template, target=target)
+
+    def gen_b1_api_spec(self):
+        template = 'api.spec.jinja'
+        target = f"{self.lower_model_name}_api.service.spec.ts"
+        self._draw_template(template_name=template, target=target)
 
     def gen_c_list(self):
         print('gen_c_list')
@@ -104,6 +99,14 @@ class ModelRegister:
     def gen_f_router(self):
         print('gen_f_router')
         pass
+
+    def _draw_template(self, template_name: str, target: str):
+        template = self._load_template(template_name)
+        context = self._build_context()
+        rendered_content = template.render(context)
+        output_file = self.output_model_dir / target
+        with output_file.open('w') as file:
+            file.write(rendered_content)
 
     @staticmethod
     def map_ts_type(t):
