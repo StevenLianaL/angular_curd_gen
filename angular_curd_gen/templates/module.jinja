@@ -1,23 +1,37 @@
 {% set list_component_name = model_name+'ListComponent' -%}
+{% set creator_component_name = model_name+'CreatorComponent' -%}
+{% set updater_component_name = model_name+'UpdaterComponent' -%}
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 import {NzTableModule} from "ng-zorro-antd/table";
 import {NzTypographyModule} from "ng-zorro-antd/typography";
+import {NzButtonModule} from "ng-zorro-antd/button";
+import {NzGridModule} from "ng-zorro-antd/grid";
+import {NzStatisticModule} from "ng-zorro-antd/statistic";
+import {NzDividerModule} from "ng-zorro-antd/divider";
 
 import { {{ app_title_name }}RoutingModule} from './{{ app_name }}-routing.module';
-import { {{ list_component_name }}} from "./{{ model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
+import { {{ list_component_name }}} from "./{{ lower_model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
+import { {{ creator_component_name }}} from "./{{ lower_model_name }}/{{ lower_model_name }}-creator/{{ lower_model_name }}-creator.component";
+import { {{ updater_component_name }}} from "./{{ lower_model_name }}/{{ lower_model_name }}-updater/{{ lower_model_name }}-updater.component";
 
 
 
 @NgModule({
   declarations: [
-    {{ list_component_name }}
+    {{ list_component_name }},
+    {{ creator_component_name }},
+    {{ updater_component_name }}
   ],
   imports: [
     CommonModule,
     NzTableModule,
+    NzButtonModule,
+    NzGridModule,
     NzTypographyModule,
+    NzStatisticModule,
+    NzDividerModule,
     {{ app_title_name }}RoutingModule,
   ]
 })

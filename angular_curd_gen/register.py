@@ -62,7 +62,7 @@ class ModelRegister:
         self.jinja_env = Environment(loader=loader)
         self.output_app_dir = Path(f"{self.app_name}")
         self.output_app_dir.mkdir(parents=True, exist_ok=True)
-        (self.output_app_dir / self.model_name).mkdir(parents=True, exist_ok=True)
+        (self.output_app_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
 
     def _load_template(self, name: str):
         return self.jinja_env.get_template(name)
@@ -92,22 +92,10 @@ class ModelRegister:
         target = f"{self.app_name}-routing.module.ts"
         self._draw_template(template_name=template, target=target)
 
-    def gen_e_list(self):
-        templates = ['ts', 'css', 'html', 'spec.ts']
-        for template in templates:
-            template_name = f'list_component/{template}.jinja'
-            target_prefix = f"{self.lower_model_name}-list"
-            (self.output_app_dir / self.model_name / target_prefix).mkdir(parents=True, exist_ok=True)
-            target = f"{self.model_name}/{target_prefix}/{target_prefix}.component.{template}"
-            self._draw_template(template_name=template_name, target=target)
-
-    def gen_f_create(self):
-        print('gen_d_create')
-        pass
-
-    def gen_g_update(self):
-        print('gen_e_update')
-        pass
+    def gen_e_components(self):
+        components = ['list', 'creator', 'updater']
+        for component in components:
+            self._draw_component(component_name=component)
 
     def _draw_template(self, template_name: str, target: str):
         template = self._load_template(template_name)
@@ -117,6 +105,15 @@ class ModelRegister:
 
         with output_file.open('w', encoding='utf8') as file:
             file.write(rendered_content)
+
+    def _draw_component(self, component_name: str):
+        templates = ['ts', 'css', 'html', 'spec.ts']
+        for template in templates:
+            template_name = f'{component_name}_component/{template}.jinja'
+            target_prefix = f"{self.lower_model_name}-{component_name}"
+            (self.output_app_dir / self.lower_model_name / target_prefix).mkdir(parents=True, exist_ok=True)
+            target = f"{self.lower_model_name}/{target_prefix}/{target_prefix}.component.{template}"
+            self._draw_template(template_name=template_name, target=target)
 
     @staticmethod
     def map_ts_type(t):

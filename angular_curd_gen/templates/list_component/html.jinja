@@ -4,6 +4,18 @@
 {% set right = '}}' -%}
 <div *ngIf="{{ model_list }}"  class="page">
     <h2 nz-typography>{{ models_name }} List</h2>
+      <nz-divider></nz-divider>
+      <div>
+        <nz-row>
+          <nz-col nzSpan="3">
+            <nz-statistic [nzValue]="{{ models_name }}List.length" [nzTitle]="'{{ models_name }} Count'"></nz-statistic>
+          </nz-col>
+          <nz-col nzSpan="3" class="center-content">
+            <a nz-button nzType="primary" nzShape="round" nzSize="large" routerLink="/{{ app_name }}/{{ lower_models_name }}/creator">Create {{ model_name }}</a>
+          </nz-col>
+        </nz-row>
+      </div>
+      <nz-divider></nz-divider>
     <nz-table #{{ table_name }} [nzData]="{{ model_list }}">
       <thead>
         <tr>

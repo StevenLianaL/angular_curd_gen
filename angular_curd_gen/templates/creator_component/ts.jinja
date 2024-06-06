@@ -1,0 +1,41 @@
+{% set service_name = model_name+'Service' -%}
+{% set component_name = model_name+'CreatorComponent' -%}
+{% set new_form_name = 'new'+ model_name +'Form' -%}
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
+import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
+import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
+
+
+@Component({
+  selector: 'app-{{ lower_model_name }}-creator',
+  templateUrl: './{{ lower_model_name }}-creator.component.html',
+  styleUrls: ['./{{ lower_model_name }}-creator.component.css']
+})
+export class {{ component_name }} implements OnInit {
+
+  {{ new_form_name }}: FormGroup = new FormGroup({});
+
+  constructor(
+    private fb: FormBuilder,
+    private api: {{ service_name }},
+  ) {
+  }
+
+  initBaseForm(): void {
+    this.{{ new_form_name }} = this.fb.group({
+      date: ['', [Validators.required]],
+    });
+  }
+
+  ngOnInit(): void {
+    this.initBaseForm();
+  }
+
+  create{{ model_name }}(): void {
+    this.api.create{{ model_name }}(this.{{ new_form_name }}.value).subscribe({
+        next:() => {}
+    })
+  }
+}
