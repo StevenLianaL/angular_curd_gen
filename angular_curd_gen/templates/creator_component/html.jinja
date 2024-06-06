@@ -1,1 +1,19 @@
-<h2 nz-typography>{{ models_name }} Creator</h2>
+<div class="page">
+    <nz-row>
+        <nz-col nzSpan="3">
+            <h2 nz-typography>添加{{ model_readable_name }}</h2>
+        </nz-col>
+        <nz-col class="center-content">
+            <nz-breadcrumb>
+                <nz-breadcrumb-item routerLink="/">首页</nz-breadcrumb-item>
+                <nz-breadcrumb-item routerLink="/{{ app_name }}">
+                    <a>{{ app_readable_name }}</a>
+                </nz-breadcrumb-item>
+                <nz-breadcrumb-item routerLink="/{{ app_name }}/{{ lower_models_name }}/creator">
+                    <a>添加{{ model_readable_name }}</a>
+                </nz-breadcrumb-item>
+            </nz-breadcrumb>
+        </nz-col>
+    </nz-row>
+      <nz-divider></nz-divider>
+</div>
