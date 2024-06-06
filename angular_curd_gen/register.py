@@ -92,10 +92,15 @@ class ModelRegister:
         target = f"{self.app_name}-routing.module.ts"
         self._draw_template(template_name=template, target=target)
 
-    def gen_e_components(self):
+    def gen_e_app_components(self):
+        components = ['dashboard']
+        for component in components:
+            self._draw_component(component_name=component, level='app')
+
+    def gen_e_model_components(self):
         components = ['list', 'creator', 'updater']
         for component in components:
-            self._draw_component(component_name=component)
+            self._draw_component(component_name=component, level='model')
 
     def _draw_template(self, template_name: str, target: str):
         template = self._load_template(template_name)
@@ -106,13 +111,23 @@ class ModelRegister:
         with output_file.open('w', encoding='utf8') as file:
             file.write(rendered_content)
 
-    def _draw_component(self, component_name: str):
+    def _draw_component(self, component_name: str, level: str = 'model'):
         templates = ['ts', 'css', 'html', 'spec.ts']
         for template in templates:
             template_name = f'{component_name}_component/{template}.jinja'
-            target_prefix = f"{self.lower_model_name}-{component_name}"
-            (self.output_app_dir / self.lower_model_name / target_prefix).mkdir(parents=True, exist_ok=True)
-            target = f"{self.lower_model_name}/{target_prefix}/{target_prefix}.component.{template}"
+            match level:
+                case 'model':
+                    target_prefix = f"{self.lower_model_name}-{component_name}"
+                    father_dir = self.output_app_dir / self.lower_model_name / target_prefix
+                    target_dir = f"{self.lower_model_name}/{target_prefix}"
+                case 'app':
+                    target_prefix = f"{self.app_name}-{component_name}"
+                    father_dir = self.output_app_dir / target_prefix
+                    target_dir = f"{target_prefix}"
+                case _:
+                    raise ValueError(f"not support level {level}")
+            father_dir.mkdir(parents=True, exist_ok=True)
+            target = f"{target_dir}/{target_prefix}.component.{template}"
             self._draw_template(template_name=template_name, target=target)
 
     @staticmethod
