@@ -16,7 +16,8 @@ class ModelRegister:
     model_admin: ModelAdmin = None
     model: BaseModel = None
 
-    app_name: str = ''  # app name
+    app_name: str = ''  # app name run in code
+    app_readable_name: str = ''  # show in page
     app_title_name = ''
 
     # extract model info
@@ -155,6 +156,7 @@ class ModelRegister:
     def _build_context(self) -> dict:
         base_context = {
             'app_name': self.app_name,
+            'app_readable_name': self.app_readable_name,
             'app_title_name': self.app_title_name,
             'model_name': self.model_name,
             'models_name': self.models_name,

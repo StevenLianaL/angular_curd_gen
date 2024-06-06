@@ -12,6 +12,8 @@ import {NzGridModule} from "ng-zorro-antd/grid";
 import {NzStatisticModule} from "ng-zorro-antd/statistic";
 import {NzDividerModule} from "ng-zorro-antd/divider";
 import {NzSpaceModule} from "ng-zorro-antd/space";
+import {NzBreadCrumbModule} from "ng-zorro-antd/breadcrumb";
+
 
 import { {{ app_title_name }}RoutingModule} from './{{ app_name }}-routing.module';
 import { {{ list_component_name }}} from "./{{ lower_model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
@@ -37,6 +39,7 @@ import { {{ dashboard_component_name }}} from "./{{ app_name }}-dashboard/{{ app
     NzStatisticModule,
     NzDividerModule,
     NzSpaceModule,
+    NzBreadCrumbModule,
     {{ app_title_name }}RoutingModule,
   ]
 })
