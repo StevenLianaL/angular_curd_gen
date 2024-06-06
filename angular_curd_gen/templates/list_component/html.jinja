@@ -30,7 +30,12 @@
             {% for ldf in list_display_restraint -%}
                 <td>{{ left }}data.{{ ldf }}{{ right }}</td>
             {% endfor -%}
-            <td>action</td>
+            <td>
+                <nz-space>
+                  <a nz-button *nzSpaceItem nzShape="round" routerLink="/{{ app_name }}/{{ lower_models_name }}/{{left}} data.id {{ right }}/updater">Update</a>
+                  <button nz-button *nzSpaceItem nzType="primary" nzShape="round" nzDanger>Delete</button>
+                </nz-space>
+            </td>
         </tr>
       </tbody>
     </nz-table>

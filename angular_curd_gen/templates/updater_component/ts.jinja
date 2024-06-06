@@ -1,11 +1,13 @@
 {% set service_name = model_name+'Service' -%}
 {% set component_name = model_name+'UpdaterComponent' -%}
 {% set update_form_name = 'update'+ model_name +'Form' -%}
+{% set edit_model = model_name+'Editable' -%}
+
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
-import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
+import { {{ edit_model }} } from '../{{ lower_model_name }}_interfaces';
 
 
 @Component({
