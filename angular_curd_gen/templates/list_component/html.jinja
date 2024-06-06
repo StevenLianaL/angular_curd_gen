@@ -3,7 +3,22 @@
 {% set left = '{{' -%}
 {% set right = '}}' -%}
 <div *ngIf="{{ model_list }}"  class="page">
-    <h2 nz-typography>{{ model_readable_name }}列表</h2>
+    <nz-row>
+        <nz-col nzSpan="3">
+            <h2 nz-typography>{{ model_readable_name }}列表</h2>
+        </nz-col>
+        <nz-col class="center-content">
+            <nz-breadcrumb>
+                <nz-breadcrumb-item routerLink="/">首页</nz-breadcrumb-item>
+                <nz-breadcrumb-item routerLink="/{{ app_name }}">
+                    <a>{{ app_readable_name }}</a>
+                </nz-breadcrumb-item>
+                <nz-breadcrumb-item routerLink="/{{ app_name }}/{{ lower_models_name }}">
+                    <a>{{ model_readable_name }}列表</a>
+                </nz-breadcrumb-item>
+            </nz-breadcrumb>
+        </nz-col>
+    </nz-row>
       <nz-divider></nz-divider>
       <div>
         <nz-row>
