@@ -2,9 +2,12 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
+import {NzTableModule} from "ng-zorro-antd/table";
+import {NzTypographyModule} from "ng-zorro-antd/typography";
+
 import { {{ app_title_name }}RoutingModule} from './{{ app_name }}-routing.module';
 import { {{ list_component_name }}} from "./{{ model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
-import {NzTableModule} from "ng-zorro-antd/table";
+
 
 
 @NgModule({
@@ -14,6 +17,7 @@ import {NzTableModule} from "ng-zorro-antd/table";
   imports: [
     CommonModule,
     NzTableModule,
+    NzTypographyModule,
     {{ app_title_name }}RoutingModule,
   ]
 })

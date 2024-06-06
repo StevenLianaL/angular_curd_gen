@@ -2,14 +2,15 @@
 {% set table_name = lower_model_name+'Table' -%}
 {% set left = '{{' -%}
 {% set right = '}}' -%}
-<div *ngIf="{{ model_list }}">
+<div *ngIf="{{ model_list }}"  class="page">
+    <h2 nz-typography>{{ models_name }} List</h2>
     <nz-table #{{ table_name }} [nzData]="{{ model_list }}">
       <thead>
         <tr>
             {% for tf in list_display_restraint_translate -%}
                 <th>{{ tf }}</th>
             {% endfor -%}
-            <td>action</td>
+            <th>action</th>
         </tr>
       </thead>
       <tbody>
