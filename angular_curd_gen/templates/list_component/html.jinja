@@ -3,15 +3,15 @@
 {% set left = '{{' -%}
 {% set right = '}}' -%}
 <div *ngIf="{{ model_list }}"  class="page">
-    <h2 nz-typography>{{ models_name }} List</h2>
+    <h2 nz-typography>{{ model_readable_name }}列表</h2>
       <nz-divider></nz-divider>
       <div>
         <nz-row>
           <nz-col nzSpan="3">
-            <nz-statistic [nzValue]="{{ models_name }}List.length" [nzTitle]="'{{ models_name }} Count'"></nz-statistic>
+            <nz-statistic [nzValue]="{{ models_name }}List.length" [nzTitle]="'{{ model_readable_name }}数量'"></nz-statistic>
           </nz-col>
           <nz-col nzSpan="3" class="center-content">
-            <a nz-button nzType="primary" nzShape="round" nzSize="large" routerLink="/{{ app_name }}/{{ lower_models_name }}/creator">Create {{ model_name }}</a>
+            <a nz-button nzType="primary" nzShape="round" nzSize="large" routerLink="/{{ app_name }}/{{ lower_models_name }}/creator">添加{{ model_readable_name }}</a>
           </nz-col>
         </nz-row>
       </div>
@@ -32,8 +32,8 @@
             {% endfor -%}
             <td>
                 <nz-space>
-                  <a nz-button *nzSpaceItem nzShape="round" routerLink="/{{ app_name }}/{{ lower_models_name }}/{{left}} data.id {{ right }}/updater">Update</a>
-                  <button nz-button *nzSpaceItem nzType="primary" nzShape="round" nzDanger>Delete</button>
+                  <a nz-button *nzSpaceItem nzShape="round" routerLink="/{{ app_name }}/{{ lower_models_name }}/{{left}} data.id {{ right }}/updater">更新</a>
+                  <button nz-button *nzSpaceItem nzType="primary" nzShape="round" nzDanger>删除</button>
                 </nz-space>
             </td>
         </tr>

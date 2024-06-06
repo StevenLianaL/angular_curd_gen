@@ -25,6 +25,7 @@ class Users(BaseModel):
 
 class UsersAdmin(ModelAdmin):
     """用户管理注释文档信息"""
+    model_readable_name = '用户'
     model_fields = ('id', 'username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active', 'created')
     list_display_restraint = model_fields
     list_editable_restraint = ('username', 'gender')
