@@ -1,6 +1,8 @@
 {% set service_name = model_name+'Service' -%}
 {% set models_list_var = models_name+'List' -%}
 import {Component, OnInit} from '@angular/core';
+import {NzMessageService} from "ng-zorro-antd/message";
+
 import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
 import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
 
@@ -14,12 +16,14 @@ export class {{ model_name }}ListComponent implements OnInit {
 
   constructor(
     private api: {{ service_name }},
+    private msg: NzMessageService,
   ) {}
 
   ngOnInit(): void {
     this.api.getAll{{ models_name }}().subscribe({
         next: ({{ lower_models_name }}) => {
           this.{{ models_list_var }} = {{ lower_models_name }};
+          this.msg.success('获取{{ model_readable_name }}列表成功');
         },
     });
   }
@@ -28,6 +32,7 @@ export class {{ model_name }}ListComponent implements OnInit {
     this.api.delete{{ model_name }}(id).subscribe({
       next: () => {
         this.{{ models_list_var }} = this.{{ models_list_var }}.filter(({{ lower_model_name }}) => {{ lower_model_name }}.id !== id);
+        this.msg.success('删除{{ model_readable_name }}成功');
       }
     });
   }
