@@ -8,6 +8,9 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./{{ app_name }}-dashboard.component.css']
 })
 export class {{ component_name }} implements OnInit {
+  models = ['{{ lower_models_name }}']
+  modelsTranslations = new Map([['{{ lower_models_name }}', '{{ model_readable_name }}']]);
+
 
   constructor(
   ) {

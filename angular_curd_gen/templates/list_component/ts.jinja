@@ -23,4 +23,15 @@ export class {{ model_name }}ListComponent implements OnInit {
         },
     });
   }
+
+  delete{{ model_name }}(id: number): void {
+    this.api.delete{{ model_name }}(id).subscribe({
+      next: () => {
+        this.{{ models_list_var }} = this.{{ models_list_var }}.filter(({{ lower_model_name }}) => {{ lower_model_name }}.id !== id);
+      }
+    });
+  }
+
+  giveUpDeleteUser(): void {
+  }
 }

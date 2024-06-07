@@ -1,3 +1,5 @@
+{% set left = '{{' -%}
+{% set right = '}}' -%}
 <div class="page">
   <nz-row>
     <nz-col nzSpan="2">
@@ -10,6 +12,23 @@
           <a>{{ app_readable_name }}</a>
         </nz-breadcrumb-item>
       </nz-breadcrumb>
+    </nz-col>
+  </nz-row>
+  <nz-divider></nz-divider>
+  <nz-row>
+    <nz-col nzSpan="8">
+      <ul nz-list [nzDataSource]="models" nzBordered nzSize="large">
+        @for (item of models; track item) {
+          <li nz-list-item nzNoFlex>
+            <ul nz-list-item-actions>
+              <nz-list-item-action>
+                <a routerLink="/first/{{ left }}item{{ right }}/creator">添加</a>
+              </nz-list-item-action>
+            </ul>
+            <a routerLink="/first/{{ left }}item{{ right }}">{{ left }} modelsTranslations.get(item) {{ right }}</a>
+          </li>
+        }
+      </ul>
     </nz-col>
   </nz-row>
 </div>

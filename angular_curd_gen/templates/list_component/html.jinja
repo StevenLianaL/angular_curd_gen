@@ -48,7 +48,12 @@
             <td>
                 <nz-space>
                   <a nz-button *nzSpaceItem nzShape="round" routerLink="/{{ app_name }}/{{ lower_models_name }}/{{left}} data.id {{ right }}/updater">更新</a>
-                  <button nz-button *nzSpaceItem nzType="primary" nzShape="round" nzDanger>删除</button>
+                  <button nz-button *nzSpaceItem nzType="primary" nzShape="round" nzDanger
+                          nz-popconfirm
+                          nzPopconfirmTitle="确定删除{{ model_readable_name }}吗?"
+                          (nzOnConfirm)="delete{{ model_name }}(data.id)"
+                          (nzOnCancel)="giveUpDelete{{ model_name }}()">删除
+                  </button>
                 </nz-space>
             </td>
         </tr>
