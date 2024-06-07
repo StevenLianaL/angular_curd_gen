@@ -1,25 +1,5 @@
 {% set component_name = app_title_name+'DashboardComponent' -%}
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { {{ component_name }} } from './{{ app_name }}-dashboard.component';
+{% set lower_component_name = app_name+'-dashboard' -%}
+{% from 'macros/ts.spec.jinja' import spec_ts -%}
+{{ spec_ts(component_name, lower_component_name) }}
 
-describe('{{ component_name }}', () => {
-  let component: {{ component_name }};
-  let fixture: ComponentFixture<{{ component_name }}>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ {{ component_name }} ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent({{ component_name }});
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
