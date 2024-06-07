@@ -16,9 +16,11 @@ import {NzBreadCrumbModule} from "ng-zorro-antd/breadcrumb";
 import {NzListModule} from "ng-zorro-antd/list";
 import {NzPopconfirmModule} from "ng-zorro-antd/popconfirm";
 import {NzMessageModule} from "ng-zorro-antd/message";
-
-
-
+import {ReactiveFormsModule} from "@angular/forms";
+import {NzFormModule} from "ng-zorro-antd/form";
+import {NzInputModule} from "ng-zorro-antd/input";
+import {NzCheckboxModule} from "ng-zorro-antd/checkbox";
+import {NzDatePickerModule} from "ng-zorro-antd/date-picker";
 
 import { {{ app_title_name }}RoutingModule} from './{{ app_name }}-routing.module';
 import { {{ list_component_name }}} from "./{{ lower_model_name }}/{{ lower_model_name }}-list/{{ lower_model_name }}-list.component";
@@ -48,6 +50,11 @@ import { {{ dashboard_component_name }}} from "./{{ app_name }}-dashboard/{{ app
     NzPopconfirmModule,
     NzBreadCrumbModule,
     NzMessageModule,
+    NzFormModule,
+    ReactiveFormsModule,
+    NzInputModule,
+    NzCheckboxModule,
+    NzDatePickerModule,
     {{ app_title_name }}RoutingModule,
   ]
 })

@@ -14,12 +14,12 @@ class Users(BaseModel):
     lastname: str
     nickname: str = ''
     gender: str
-    birthday: str
+    birthday: datetime
     role: str
     email: str
     mobile: str
     address: str
-    active: int
+    active: bool
     created: datetime
 
 

@@ -26,7 +26,9 @@ export class {{ component_name }} implements OnInit {
 
   initBaseForm(): void {
     this.{{ new_form_name }} = this.fb.group({
-      date: ['', [Validators.required]],
+        {% for form_field in model_create_fields -%}
+            {{ form_field }}: ['', [Validators.required]],
+        {% endfor -%}
     });
   }
 
