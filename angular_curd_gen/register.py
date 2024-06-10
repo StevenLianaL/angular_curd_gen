@@ -7,7 +7,7 @@ from parse import parse
 from pydantic import BaseModel
 
 from angular_curd_gen.admin import ModelAdmin
-from angular_curd_gen.config import TEMPLATE_DIR
+from angular_curd_gen.config import TEMPLATE_DIR, BACKEND_TEMPLATE_DIR, FRONTEND_TEMPLATE_DIR
 
 
 @dataclass
@@ -64,11 +64,12 @@ class ModelRegister:
 
         self.out_app_dir = Path(f"{self.app_name}")
 
-        self.out_rust_dir = self.out_app_dir / 'rust'
-        self.output_angular_dir = self.out_app_dir / 'angular'
+        self.out_rust_dir = self.out_app_dir / BACKEND_TEMPLATE_DIR
+        self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR
+        self.out_rust_src_dir = self.out_rust_dir / 'src'
 
         self.output_angular_dir.mkdir(parents=True, exist_ok=True)
-        self.out_rust_dir.mkdir(parents=True, exist_ok=True)
+        self.out_rust_src_dir.mkdir(parents=True, exist_ok=True)
         (self.output_angular_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
 
     def _load_template(self, name: str):
@@ -109,8 +110,24 @@ class ModelRegister:
         for component in components:
             self._draw_component(component_name=component, level='model')
 
-    def gen_rust_project(self):
+    def gen_f_rust_project_files(self):
         """Generate rust project with rust"""
+        rust_template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR
+        for file in rust_template_dir.iterdir():
+            if file.is_file() and file.name.endswith('.jinja'):
+                template_name = file.name.removesuffix('.jinja')
+                self._draw_template(
+                    template_name=f"{BACKEND_TEMPLATE_DIR}/{file.name}",
+                    target=template_name, project=BACKEND_TEMPLATE_DIR)
+
+    def gen_g_rust_scripts(self):
+        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
+        for file in template_dir.iterdir():
+            if file.is_file() and file.name.endswith('.jinja'):
+                template_name = file.name.removesuffix('.jinja')
+                self._draw_template(
+                    template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file.name}",
+                    target=f"src/{template_name}", project=BACKEND_TEMPLATE_DIR)
 
     def _draw_template(self, template_name: str, target: str, project: str = 'angular'):
         """
