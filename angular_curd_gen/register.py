@@ -27,7 +27,7 @@ class ModelRegister:
     lower_models_name = ''
     model_fields_map = None  # all model fields with type dict[str,type]
     jinja_env = None
-    output_app_dir = ''
+    output_angular_dir = ''
 
     # extract model admin info
     model_admin_fields = ()
@@ -61,9 +61,15 @@ class ModelRegister:
         # template
         loader = FileSystemLoader(TEMPLATE_DIR)
         self.jinja_env = Environment(loader=loader)
-        self.output_app_dir = Path(f"{self.app_name}")
-        self.output_app_dir.mkdir(parents=True, exist_ok=True)
-        (self.output_app_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
+
+        self.out_app_dir = Path(f"{self.app_name}")
+
+        self.out_rust_dir = self.out_app_dir / 'rust'
+        self.output_angular_dir = self.out_app_dir / 'angular'
+
+        self.output_angular_dir.mkdir(parents=True, exist_ok=True)
+        self.out_rust_dir.mkdir(parents=True, exist_ok=True)
+        (self.output_angular_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
 
     def _load_template(self, name: str):
         return self.jinja_env.get_template(name)
@@ -71,27 +77,27 @@ class ModelRegister:
     def gen_a_interface(self):
         template = 'interfaces.jinja'
         target = f"{self.model_name}/{self.lower_model_name}_interfaces.ts"
-        self._draw_template(template_name=template, target=target)
+        self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_b_api(self):
         template = 'api.jinja'
         target = f"{self.model_name}/{self.lower_model_name}_api.service.ts"
-        self._draw_template(template_name=template, target=target)
+        self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_b1_api_spec(self):
         template = 'api.spec.jinja'
         target = f"{self.model_name}/{self.lower_model_name}_api.service.spec.ts"
-        self._draw_template(template_name=template, target=target)
+        self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_c_module(self):
         template = 'module.jinja'
         target = f"{self.app_name}.module.ts"
-        self._draw_template(template_name=template, target=target)
+        self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_d_router(self):
         template = 'routers.jinja'
         target = f"{self.app_name}-routing.module.ts"
-        self._draw_template(template_name=template, target=target)
+        self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_e_app_components(self):
         components = ['dashboard']
@@ -103,11 +109,26 @@ class ModelRegister:
         for component in components:
             self._draw_component(component_name=component, level='model')
 
-    def _draw_template(self, template_name: str, target: str):
+    def gen_rust_project(self):
+        """Generate rust project with rust"""
+
+    def _draw_template(self, template_name: str, target: str, project: str = 'angular'):
+        """
+        :param template_name:
+        :param target:
+        :param project: angular/rust
+        :return:
+        """
         template = self._load_template(template_name)
         context = self._build_context()
         rendered_content = template.render(context)
-        output_file = self.output_app_dir / target
+        match project:
+            case 'angular':
+                output_file = self.output_angular_dir / target
+            case 'rust':
+                output_file = self.out_rust_dir / target
+            case _:
+                raise ValueError(f"not support project {project}")
 
         with output_file.open('w', encoding='utf8') as file:
             file.write(rendered_content)
@@ -119,17 +140,17 @@ class ModelRegister:
             match level:
                 case 'model':
                     target_prefix = f"{self.lower_model_name}-{component_name}"
-                    father_dir = self.output_app_dir / self.lower_model_name / target_prefix
+                    father_dir = self.output_angular_dir / self.lower_model_name / target_prefix
                     target_dir = f"{self.lower_model_name}/{target_prefix}"
                 case 'app':
                     target_prefix = f"{self.app_name}-{component_name}"
-                    father_dir = self.output_app_dir / target_prefix
+                    father_dir = self.output_angular_dir / target_prefix
                     target_dir = f"{target_prefix}"
                 case _:
                     raise ValueError(f"not support level {level}")
             father_dir.mkdir(parents=True, exist_ok=True)
             target = f"{target_dir}/{target_prefix}.component.{template}"
-            self._draw_template(template_name=template_name, target=target)
+            self._draw_template(template_name=template_name, target=target, project='angular')
 
     @staticmethod
     def map_ts_type(t):
