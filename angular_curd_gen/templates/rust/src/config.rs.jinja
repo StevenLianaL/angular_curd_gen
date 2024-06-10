@@ -1,0 +1,36 @@
+use config::{Config};
+use lazy_static::lazy_static;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+pub struct Settings {
+    pub debug: bool,
+    pub port: u16,
+    pub database: DatabaseSettings,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DatabaseSettings {
+    pub user: String,
+    pub password: String,
+    pub host: String,
+    pub port: u16,
+    pub name: String,
+}
+
+
+lazy_static! {
+    pub static ref SETTINGS: Settings = {
+        let builder = Config::builder()
+            .set_default("debug", true).unwrap()
+            .set_default("port", 8000).unwrap()
+            .set_default("database.user", "test").unwrap()
+            .set_default("database.password", "test").unwrap()
+            .set_default("database.host", "localhost").unwrap()
+            .set_default("database.port", 3306).unwrap()
+            .set_default("database.name", "test").unwrap();
+            // .add_source(Environment::with_prefix("APP"));
+
+        builder.build().unwrap().try_deserialize().unwrap()
+    };
+}
