@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from angular_curd_gen.register import ModelRegister, ModelAdmin
+from angular_curd_gen.register import ModelRegister, ModelAdmin, generate_whole_app
 
 
 class Users(BaseModel):
@@ -35,5 +35,4 @@ class UsersAdmin(ModelAdmin):
 
 
 def test_register():
-    mr = ModelRegister(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用')
-    mr.register()
+    generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用')

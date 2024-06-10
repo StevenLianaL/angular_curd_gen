@@ -75,60 +75,6 @@ class ModelRegister:
     def _load_template(self, name: str):
         return self.jinja_env.get_template(name)
 
-    def gen_a_interface(self):
-        template = 'interfaces.jinja'
-        target = f"{self.model_name}/{self.lower_model_name}_interfaces.ts"
-        self._draw_template(template_name=template, target=target, project='angular')
-
-    def gen_b_api(self):
-        template = 'api.jinja'
-        target = f"{self.model_name}/{self.lower_model_name}_api.service.ts"
-        self._draw_template(template_name=template, target=target, project='angular')
-
-    def gen_b1_api_spec(self):
-        template = 'api.spec.jinja'
-        target = f"{self.model_name}/{self.lower_model_name}_api.service.spec.ts"
-        self._draw_template(template_name=template, target=target, project='angular')
-
-    def gen_c_module(self):
-        template = 'module.jinja'
-        target = f"{self.app_name}.module.ts"
-        self._draw_template(template_name=template, target=target, project='angular')
-
-    def gen_d_router(self):
-        template = 'routers.jinja'
-        target = f"{self.app_name}-routing.module.ts"
-        self._draw_template(template_name=template, target=target, project='angular')
-
-    def gen_e_app_components(self):
-        components = ['dashboard']
-        for component in components:
-            self._draw_component(component_name=component, level='app')
-
-    def gen_e_model_components(self):
-        components = ['list', 'creator', 'updater']
-        for component in components:
-            self._draw_component(component_name=component, level='model')
-
-    def gen_f_rust_project_files(self):
-        """Generate rust project with rust"""
-        rust_template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR
-        for file in rust_template_dir.iterdir():
-            if file.is_file() and file.name.endswith('.jinja'):
-                template_name = file.name.removesuffix('.jinja')
-                self._draw_template(
-                    template_name=f"{BACKEND_TEMPLATE_DIR}/{file.name}",
-                    target=template_name, project=BACKEND_TEMPLATE_DIR)
-
-    def gen_g_rust_scripts(self):
-        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
-        for file in template_dir.iterdir():
-            if file.is_file() and file.name.endswith('.jinja'):
-                template_name = file.name.removesuffix('.jinja')
-                self._draw_template(
-                    template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file.name}",
-                    target=f"src/{template_name}", project=BACKEND_TEMPLATE_DIR)
-
     def _draw_template(self, template_name: str, target: str, project: str = 'angular'):
         """
         :param template_name:
@@ -217,3 +163,77 @@ class ModelRegister:
 
         context = base_context | model_admin_context
         return context
+
+
+@dataclass
+class AngularModelRegister(ModelRegister):
+    """"""
+
+    def gen_a_interface(self):
+        template = 'interfaces.jinja'
+        target = f"{self.model_name}/{self.lower_model_name}_interfaces.ts"
+        self._draw_template(template_name=template, target=target, project='angular')
+
+    def gen_b_api(self):
+        template = 'api.jinja'
+        target = f"{self.model_name}/{self.lower_model_name}_api.service.ts"
+        self._draw_template(template_name=template, target=target, project='angular')
+
+    def gen_b1_api_spec(self):
+        template = 'api.spec.jinja'
+        target = f"{self.model_name}/{self.lower_model_name}_api.service.spec.ts"
+        self._draw_template(template_name=template, target=target, project='angular')
+
+    def gen_c_module(self):
+        template = 'module.jinja'
+        target = f"{self.app_name}.module.ts"
+        self._draw_template(template_name=template, target=target, project='angular')
+
+    def gen_d_router(self):
+        template = 'routers.jinja'
+        target = f"{self.app_name}-routing.module.ts"
+        self._draw_template(template_name=template, target=target, project='angular')
+
+    def gen_e_app_components(self):
+        components = ['dashboard']
+        for component in components:
+            self._draw_component(component_name=component, level='app')
+
+    def gen_e_model_components(self):
+        components = ['list', 'creator', 'updater']
+        for component in components:
+            self._draw_component(component_name=component, level='model')
+
+
+@dataclass
+class RustModelRegister(ModelRegister):
+    """"""
+
+    def gen_f_rust_project_files(self):
+        """Generate rust project with rust"""
+        rust_template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR
+        for file in rust_template_dir.iterdir():
+            if file.is_file() and file.name.endswith('.jinja'):
+                template_name = file.name.removesuffix('.jinja')
+                self._draw_template(
+                    template_name=f"{BACKEND_TEMPLATE_DIR}/{file.name}",
+                    target=template_name, project=BACKEND_TEMPLATE_DIR)
+
+    def gen_g_rust_scripts(self):
+        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
+        for file in template_dir.iterdir():
+            if file.is_file() and file.name.endswith('.jinja'):
+                template_name = file.name.removesuffix('.jinja')
+                self._draw_template(
+                    template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file.name}",
+                    target=f"src/{template_name}", project=BACKEND_TEMPLATE_DIR)
+
+
+def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin):
+    """generate whole app"""
+    amr = AngularModelRegister(model_admin=model_admin, model=model, app_name=app_name,
+                               app_readable_name=app_readable_name)
+    amr.register()
+    rmr = RustModelRegister(model_admin=model_admin, model=model, app_name=app_name,
+                            app_readable_name=app_readable_name)
+    rmr.register()
