@@ -22,6 +22,6 @@ async fn create_{{ lower_model_name }}(state: State<AppState>, Json(payload): Js
     {%- endfor %}
         ..Default::default()
     };
-    let user = new_user.insert(&state.conn).await.unwrap();
-    Json(user)
+    let {{ lower_model_name }} = new_{{ lower_model_name }}.insert(&state.conn).await.unwrap();
+    Json({{ lower_model_name }})
 }

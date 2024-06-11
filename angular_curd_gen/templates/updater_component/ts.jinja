@@ -35,10 +35,10 @@ export class {{ component_name }} implements OnInit {
   ) {
   }
 
-  initBaseForm(user: User): void {
+  initBaseForm({{ lower_model_name }}: {{ model_name }}): void {
     this.{{ update_form_name }} = this.fb.group({
         {% for form_field in model_edit_fields -%}
-            {{ form_field }}: [user.{{ form_field }}, [Validators.required]],
+            {{ form_field }}: [{{ lower_model_name }}.{{ form_field }}, [Validators.required]],
         {% endfor -%}
     });
   }
