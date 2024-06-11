@@ -19,3 +19,10 @@ pub struct Model {
 pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct {{ model_name }}Creatable {
+{%- for field,field_type in model_create_fields_type_map.items() %}
+    pub {{ field }}: {{ cls.map_rust_type(field_type) }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+}

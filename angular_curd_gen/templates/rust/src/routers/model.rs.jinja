@@ -1,16 +1,27 @@
 use axum::extract::State;
 use axum::{Json, Router};
 use axum::routing::get;
-use sea_orm::{EntityTrait};
-use crate::entities::{{ model_name }};
-use crate::entities::{{ lower_model_name }}::Model;
+use sea_orm::{ActiveModelTrait, EntityTrait};
+use sea_orm::ActiveValue::Set;
+use crate::entities::{ {{ model_name }}, {{ lower_model_name }} };
 use crate::utils::AppState;
 
 pub fn {{ lower_model_name }}_routes() -> Router<AppState> {
-    Router::new().route("/{{ lower_models_name }}/", get(get_{{ lower_models_name }}_list))
+    Router::new().route("/{{ lower_models_name }}/", get(get_{{ lower_models_name }}_list).post(create_{{ lower_model_name }}))
 }
 
-async fn get_{{ lower_models_name }}_list(state: State<AppState>) -> Json<Vec<Model>> {
+async fn get_{{ lower_models_name }}_list(state: State<AppState>) -> Json<Vec<{{ lower_model_name }}::Model>> {
     let {{ lower_models_name }} = {{ model_name }}::find().all(&state.conn).await.unwrap();
     Json({{ lower_models_name }})
+}
+
+async fn create_{{ lower_model_name }}(state: State<AppState>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Creatable>) -> Json<{{ lower_model_name }}::Model> {
+    let new_{{ lower_model_name }} = {{ lower_model_name }}::ActiveModel {
+    {%- for field,field_type in model_create_fields_type_map.items() %}
+        {{ field }}: Set(payload.{{ field }}),
+    {%- endfor %}
+        ..Default::default()
+    };
+    let user = new_user.insert(&state.conn).await.unwrap();
+    Json(user)
 }
