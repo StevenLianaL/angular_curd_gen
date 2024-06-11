@@ -31,7 +31,7 @@
         </nz-row>
       </div>
       <nz-divider></nz-divider>
-    <nz-table #{{ table_name }} [nzData]="{{ model_list }}">
+    <nz-table #{{ table_name }} [nzData]="{{ model_list }}"  [nzPageSize]="100">
       <thead>
         <tr>
             {% for tf in list_display_restraint_translate -%}
