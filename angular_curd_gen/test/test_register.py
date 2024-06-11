@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 
 from pydantic import BaseModel
 
-from angular_curd_gen.register import ModelRegister, ModelAdmin, generate_whole_app
+from angular_curd_gen.register import ModelAdmin, generate_whole_app
 
 
 class Users(BaseModel):
@@ -14,7 +14,7 @@ class Users(BaseModel):
     lastname: str
     nickname: str = ''
     gender: str
-    birthday: datetime
+    birthday: date
     role: str
     email: str
     mobile: str

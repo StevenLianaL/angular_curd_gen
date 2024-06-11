@@ -43,6 +43,7 @@ mr.register()
 ```bash
 ng new project-name --no-standalone
 ng add ng-zorro-antd
+npm install dayjs
 ```
 #### code
 - env

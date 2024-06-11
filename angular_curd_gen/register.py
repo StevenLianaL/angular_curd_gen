@@ -116,23 +116,25 @@ class ModelRegister:
             self._draw_template(template_name=template_name, target=target, project='angular')
 
     @staticmethod
-    def map_ts_type(t):
+    def extract_py_type(t):
         type_str = parse("<class '{type}'>", str(t))
         if not type_str:  # option
             type_str = parse("typing.Optional[{type}]", str(t))
 
         the_type = type_str.named['type']
+        return the_type
+
+    def map_ts_type(self, t):
+        the_type = self.extract_py_type(t)
 
         match the_type:
-            case 'int':
+            case 'int' | 'float':
                 return 'number'
             case 'str':
                 return 'string'
             case 'bool':
                 return 'boolean'
-            case 'float':
-                return 'number'
-            case 'datetime.datetime':
+            case 'datetime.datetime' | 'datetime.date':
                 return 'Date'
             case _:
                 raise ValueError(f"not support type {t}")
