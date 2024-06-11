@@ -42,8 +42,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let data of {{ table_name }}.data">
-            {% for ldf in list_display_restraint -%}
-                <td>{{ left }}data.{{ ldf }}{{ right }}</td>
+            {% for ldf,ldf_type in list_display_restraint_type_map.items() -%}
+                {%- if cls.extract_py_type(ldf_type)=='bool' -%}
+                <td [ngSwitch]="data.{{ ldf }}">
+                  <span *ngSwitchCase="true" nz-icon nzType="check-circle" nzTheme="twotone"></span>
+                  <span *ngSwitchCase="false" nz-icon nzType="close-circle" nzTheme="twotone" [twoToneColor]="'red'"></span>
+                </td>
+                {%- else -%}
+                    <td>{{ left }}data.{{ ldf }}{{ right }}</td>
+                {%- endif %}
             {% endfor -%}
             <td>
                 <nz-space>

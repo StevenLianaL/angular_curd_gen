@@ -179,6 +179,8 @@ class ModelRegister:
                                                         k1 in k_value}
             if k.endswith('_restraint'):
                 model_admin_context[f"{k}_translate"] = [base_context['fields_translate_map'][v] for v in k_value]
+                model_admin_context[f"{k}_type_map"] = {v: self.model_fields_map[v]
+                                                        for v in k_value}
 
         context = base_context | model_admin_context
         return context
@@ -253,7 +255,7 @@ class RustModelRegister(ModelRegister):
 
         for folder in template_dir.iterdir():
             if folder.is_dir():
-                (self.out_rust_src_dir/folder.name).mkdir(parents=True, exist_ok=True)
+                (self.out_rust_src_dir / folder.name).mkdir(parents=True, exist_ok=True)
                 for file in folder.iterdir():
                     if file.is_file() and file.name.endswith('.jinja'):
                         template_name = file.name.removesuffix('.jinja')
