@@ -1,5 +1,6 @@
 {% set create_model = model_name+'Creatable' -%}
 {% set edit_model = model_name+'Editable' -%}
+use chrono::NaiveDate;
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 

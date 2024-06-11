@@ -151,8 +151,10 @@ class ModelRegister:
                 return 'String'
             case 'bool':
                 return 'bool'
-            case 'datetime.datetime' | 'datetime.date':
+            case 'datetime.datetime':
                 return 'DateTime'
+            case 'datetime.date':
+                return 'NaiveDate'
             case _:
                 raise ValueError(f"not support type {t}")
 
