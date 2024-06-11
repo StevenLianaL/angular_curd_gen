@@ -139,6 +139,23 @@ class ModelRegister:
             case _:
                 raise ValueError(f"not support type {t}")
 
+    def map_rust_type(self, t):
+        the_type = self.extract_py_type(t)
+
+        match the_type:
+            case 'int':
+                return 'i64'
+            case 'float':
+                return 'f64'
+            case 'str':
+                return 'String'
+            case 'bool':
+                return 'bool'
+            case 'datetime.datetime' | 'datetime.date':
+                return 'DateTime'
+            case _:
+                raise ValueError(f"not support type {t}")
+
     def _build_context(self) -> dict:
         base_context = {
             'app_name': self.app_name,
@@ -229,6 +246,21 @@ class RustModelRegister(ModelRegister):
                 self._draw_template(
                     template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file.name}",
                     target=f"src/{template_name}", project=BACKEND_TEMPLATE_DIR)
+
+    def gen_h_rust_sub_modules(self):
+        """Generate rust sub modules"""
+        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
+
+        for folder in template_dir.iterdir():
+            if folder.is_dir():
+                (self.out_rust_src_dir/folder.name).mkdir(parents=True, exist_ok=True)
+                for file in folder.iterdir():
+                    if file.is_file() and file.name.endswith('.jinja'):
+                        template_name = file.name.removesuffix('.jinja')
+                        target = f"src/{folder.name}/{template_name}".replace('model', self.lower_model_name)
+                        self._draw_template(
+                            template_name=f"{BACKEND_TEMPLATE_DIR}/src/{folder.name}/{file.name}",
+                            target=target, project=BACKEND_TEMPLATE_DIR)
 
 
 def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin):

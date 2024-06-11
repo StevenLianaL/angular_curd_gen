@@ -1,0 +1,16 @@
+use axum::extract::State;
+use axum::{Json, Router};
+use axum::routing::get;
+use sea_orm::{EntityTrait};
+use crate::entities::{{ model_name }};
+use crate::entities::{{ lower_model_name }}::Model;
+use crate::utils::AppState;
+
+pub fn {{ lower_model_name }}_routes() -> Router<AppState> {
+    Router::new().route("/{{ lower_models_name }}/", get(get_{{ lower_models_name }}_list))
+}
+
+async fn get_{{ lower_models_name }}_list(state: State<AppState>) -> Json<Vec<Model>> {
+    let {{ lower_models_name }} = {{ model_name }}::find().all(&state.conn).await.unwrap();
+    Json({{ lower_models_name }})
+}
