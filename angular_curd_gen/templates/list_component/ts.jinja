@@ -1,3 +1,4 @@
+{% from 'macros/list_filter_params.jinja' import gen_list_filter_params, gen_list_filter_params_only -%}
 {% set service_name = model_name+'Service' -%}
 {% set models_list_var = models_name+'List' -%}
 import {Component, OnInit} from '@angular/core';
@@ -14,17 +15,26 @@ import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
 export class {{ model_name }}ListComponent implements OnInit {
   {{ models_list_var }}: {{ model_name }}[] = [];
 
+  {% for field,field_type in list_filter_fields_type_map.items() %}
+      query{{ field|title }}?: {{ cls.map_ts_type(field_type) }}
+  {% endfor %}
+
+
   constructor(
     private api: {{ service_name }},
     private msg: NzMessageService,
   ) {}
 
   ngOnInit(): void {
-    this.api.getAll{{ models_name }}().subscribe({
-        next: ({{ lower_models_name }}) => {
-          this.{{ models_list_var }} = {{ lower_models_name }};
-          this.msg.success('获取{{ model_readable_name }}列表成功');
-        },
+    this.get{{ models_name }}();
+  }
+
+  get{{ models_name }}({{ gen_list_filter_params(cls, list_filter_fields_type_map) }}) {
+    this.api.get{{ models_name }}({{ gen_list_filter_params_only(list_filter_fields_type_map) }}).subscribe({
+      next: ({{ lower_models_name }}) => {
+        this.{{ models_name }}List = {{ lower_models_name }};
+        this.msg.success('获取{{ model_readable_name }}列表成功');
+      },
     });
   }
 

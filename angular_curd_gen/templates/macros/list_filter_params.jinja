@@ -1,0 +1,11 @@
+{% macro gen_list_filter_params(cls, list_filter_fields_type_map) -%}
+    {%- for field,field_type in list_filter_fields_type_map.items() -%}
+        {{ field }}?: {{ cls.map_ts_type(field_type) }}{% if not loop.last %}, {% endif %}
+    {%- endfor -%}
+{% endmacro %}
+
+{% macro gen_list_filter_params_only(list_filter_fields_type_map) %}
+    {%- for field in list_filter_fields_type_map -%}
+        {{ field }}{% if not loop.last %}, {% endif %}
+    {%- endfor -%}
+{% endmacro %}

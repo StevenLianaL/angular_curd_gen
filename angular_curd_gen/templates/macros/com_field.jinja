@@ -1,0 +1,16 @@
+{% macro gen_com_field(cls, models_name, field_name, field_type, fields_translate_map, index) -%}
+    {% set field_py_type = cls.extract_py_type(field_type) -%}
+    {% set field_translate_name = fields_translate_map[field_name] -%}
+    {% if field_py_type=='str' %}
+        <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton{{ field_name|title }}">
+            <input type="text" nz-input placeholder="搜索{{ field_translate_name }}"
+                   [(ngModel)]="query{{ field_name|title }}"/>
+        </nz-input-group>
+        <ng-template #suffixIconButton{{ field_name|title }}>
+            <button nz-button nzType="primary" nzSearch><span nz-icon nzType="search"
+                                                              (click)="get{{ models_name }}({{ cls.build_query_params(index,"query"+field_name.title()) }})"></span>
+            </button>
+        </ng-template>
+    {% else %}
+    {% endif %}
+{% endmacro %}

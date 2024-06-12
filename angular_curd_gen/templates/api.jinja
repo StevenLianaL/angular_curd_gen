@@ -1,3 +1,4 @@
+{% from 'macros/list_filter_params.jinja' import gen_list_filter_params -%}
 {% set create_model = model_name+'Creatable' -%}
 {% set edit_model = model_name+'Editable' -%}
 import { Injectable } from '@angular/core';
@@ -14,8 +15,14 @@ export class {{ model_name }}Service {
 
   constructor(private http: HttpClient) {}
 
-  getAll{{ models_name }}(): Observable<{{ model_name }}[]> {
-    return this.http.get<{{ model_name }}[]>(`${this.baseUrl}`);
+  get{{ models_name }}({{ gen_list_filter_params(cls, list_filter_fields_type_map) }}): Observable<{{ model_name }}[]> {
+    let url = `${this.baseUrl}?a=0`
+    {% for field in list_filter_fields -%}
+    if({{ field }}){
+      url += `&{{ field }}=${ {{ field }} }`;
+    }
+    {%- endfor -%}
+    return this.http.get<{{ model_name }}[]>(url);
   }
 
   get{{ model_name }}ById(id: number): Observable<{{ model_name }}> {

@@ -168,6 +168,20 @@ class ModelRegister:
             case _:
                 raise ValueError(f"not support type {t}")
 
+    def map_ts_type_default(self, t):
+        the_type = self.extract_py_type(t)
+        match the_type:
+            case 'int' | 'float':
+                return '0'
+            case 'str':
+                return "''"
+            case 'bool':
+                return 'null'
+            case 'datetime.datetime' | 'datetime.date':
+                return 'null'
+            case _:
+                raise ValueError(f"not support type {t}")
+
     def map_rust_type(self, t):
         the_type = self.extract_py_type(t)
 
@@ -219,6 +233,11 @@ class ModelRegister:
 
         context = base_context | model_admin_context
         return context
+
+    def build_query_params(self, index: int, field: str):
+        params_list = ['undefined' for _ in range(len(self.model_admin.list_filter_fields))]
+        params_list[index] = field
+        return ', '.join(params_list)
 
 
 @dataclass

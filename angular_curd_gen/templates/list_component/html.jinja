@@ -1,3 +1,4 @@
+{% from 'macros/com_field.jinja' import gen_com_field -%}
 {% set model_list = models_name+'List' -%}
 {% set table_name = lower_model_name+'Table' -%}
 {% set left = '{{' -%}
@@ -30,6 +31,15 @@
           </nz-col>
         </nz-row>
       </div>
+      <nz-divider></nz-divider>
+      <nz-row>
+          {% for field,field_type in list_filter_fields_type_map.items() -%}
+              <nz-col>{{ gen_com_field(cls,models_name,field,field_type,fields_translate_map,loop.index0) }}</nz-col>
+          {%- endfor %}
+        <nz-col>
+          <button nz-button nzType="primary" nzShape="round" (click)="get{{ models_name }}()">重置查询</button>
+        </nz-col>
+      </nz-row>
       <nz-divider></nz-divider>
     <nz-table #{{ table_name }} [nzData]="{{ model_list }}"  [nzPageSize]="50">
       <thead>
