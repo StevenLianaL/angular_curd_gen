@@ -65,7 +65,7 @@ class ModelRegister:
         self.out_app_dir = Path(f"{self.app_name}")
 
         self.out_rust_dir = self.out_app_dir / BACKEND_TEMPLATE_DIR
-        self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR
+        self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR / self.app_name
         self.out_rust_src_dir = self.out_rust_dir / 'src'
 
         self.output_angular_dir.mkdir(parents=True, exist_ok=True)
