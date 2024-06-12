@@ -5,13 +5,13 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get};
 use sea_orm::{ActiveModelTrait, EntityTrait, ModelTrait};
 use sea_orm::ActiveValue::Set;
-use crate::entities::{  {{ model_name }}, {{ lower_model_name }}  };
+use crate::entities::{ {{ model_name }}, {{ lower_model_name }}};
 use crate::utils::AppState;
 
 pub fn {{ lower_model_name }}_routes() -> Router<AppState> {
     Router::new()
         .route("/{{ lower_models_name }}/", get(get_{{ lower_models_name }}_list).post(create_{{ lower_model_name }}))
-        .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id/", get(get_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
+        .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id/", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
 }
 
 async fn get_{{ lower_models_name }}_list(state: State<AppState>) -> Response {
@@ -27,13 +27,24 @@ async fn get_{{ lower_model_name }}(state: State<AppState>, Path({{ lower_model_
 async fn create_{{ lower_model_name }}(state: State<AppState>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Creatable>) -> Response {
     let new_{{ lower_model_name }} = {{ lower_model_name }}::ActiveModel {
     {%- for field,field_type in model_create_fields_type_map.items() %}
-        {{ field }}: Set(payload.{{ field }}),
+        {{ field }}: Set(payload.{{ field }}.to_owned()),
     {%- endfor %}
         ..Default::default()
     };
     let {{ lower_model_name }} = new_{{ lower_model_name }}.insert(&state.conn).await.unwrap();
     (StatusCode::CREATED, Json({{ lower_model_name }})).into_response()
 }
+
+async fn update_{{ lower_model_name }}(state: State<AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Editable>) -> impl IntoResponse {
+    let raw_{{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&state.conn).await.unwrap().unwrap();
+    let mut {{ lower_model_name }}: {{ lower_model_name }}::ActiveModel = raw_{{ lower_model_name }}.into();
+    {%- for field,field_type in model_edit_fields_type_map.items() %}
+        {{ lower_model_name }}.{{ field }} = Set(payload.{{ field }}.to_owned());
+    {%- endfor %}
+    let updated_{{ lower_model_name }}: {{ lower_model_name }}::Model = {{ lower_model_name }}.update(&state.conn).await.unwrap();
+    (StatusCode::OK, Json(updated_{{ lower_model_name }})).into_response()
+}
+
 
 async fn delete_{{ lower_model_name }}(state: State<AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
     let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&state.conn).await.unwrap().unwrap();
