@@ -55,5 +55,6 @@ class AppsAdmin(ModelAdmin):
 
 
 def test_register():
-    generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用')
+    generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用',
+                       db_name='test', db_user='test', db_pswd='test')
     # generate_whole_app(model_admin=AppsAdmin, model=Apps, app_name='first', app_readable_name='纯应用')

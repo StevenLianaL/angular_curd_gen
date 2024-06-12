@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+import MySQLdb
 import inflect
 from jinja2 import FileSystemLoader, Environment
 from parse import parse
 from pydantic import BaseModel
-
+from MySQLdb.cursors import DictCursor
 from angular_curd_gen.admin import ModelAdmin
 from angular_curd_gen.config import TEMPLATE_DIR, BACKEND_TEMPLATE_DIR, FRONTEND_TEMPLATE_DIR
 
@@ -19,6 +20,13 @@ class ModelRegister:
     app_name: str = ''  # app name run in code
     app_readable_name: str = ''  # show in page
     app_title_name = ''
+
+    db_name: str = 'test'
+    db_user: str = 'test'
+    db_pswd: str = 'test'
+
+    db_list = []
+    db_field_count = {}
 
     # extract model info
     model_name = ''  # is single
@@ -71,6 +79,27 @@ class ModelRegister:
         self.output_angular_dir.mkdir(parents=True, exist_ok=True)
         self.out_rust_src_dir.mkdir(parents=True, exist_ok=True)
         (self.output_angular_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
+
+        self._prepare_data()
+
+    def _prepare_data(self):
+        """Query model data, to count frontend component."""
+        db_config = {
+            'host': 'localhost',
+            'user': self.db_user,
+            'passwd': self.db_pswd,
+            'db': self.db_name
+        }
+        db = MySQLdb.connect(**db_config, cursorclass=DictCursor)
+        cursor = db.cursor()
+        cursor.execute(f"select * from {self.models_name};")
+        self.db_list = cursor.fetchall()
+        sql = ("select " +
+               ",".join([f"COUNT(DISTINCT {f}) AS {f}" for f in self.model_admin.model_fields])
+               + f" from {self.models_name};")
+        cursor.execute(sql)
+        data = cursor.fetchone()
+        self.db_field_count = data
 
     def _load_template(self, name: str):
         return self.jinja_env.get_template(name)
@@ -169,7 +198,11 @@ class ModelRegister:
             'lower_model_name': self.lower_model_name,
             'fields_map': self.model_fields_map,
             'fields_translate_map': dict(zip(self.model_admin.model_fields, self.model_admin.model_translate_fields)),
-            'cls': self
+            'cls': self,
+            'db_name': self.db_name,
+            'db_user': self.db_user,
+            'db_pswd': self.db_pswd,
+            'db_field_count': self.db_field_count
         }
         model_admin_context = {}
         for k in self.model_admin_fields:
@@ -267,11 +300,12 @@ class RustModelRegister(ModelRegister):
                             target=target, project=BACKEND_TEMPLATE_DIR)
 
 
-def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin):
+def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin,
+                       db_name: str = 'test', db_user: str = 'test', db_pswd: str = 'test'):
     """generate whole app"""
     amr = AngularModelRegister(model_admin=model_admin, model=model, app_name=app_name,
-                               app_readable_name=app_readable_name)
+                               app_readable_name=app_readable_name, db_name=db_name, db_user=db_user, db_pswd=db_pswd)
     amr.register()
     rmr = RustModelRegister(model_admin=model_admin, model=model, app_name=app_name,
-                            app_readable_name=app_readable_name)
+                            app_readable_name=app_readable_name, db_name=db_name, db_user=db_user, db_pswd=db_pswd)
     rmr.register()

@@ -29,7 +29,7 @@ lazy_static! {
         let builder = Config::builder()
             .set_default("debug", true).unwrap()
             .set_default("port", 8000).unwrap()
-            .set_default("db.name", "test").unwrap()
+            .set_default("db.name", "{{ db_name }}").unwrap()
             .add_source(Environment::with_prefix("PREFIX").separator("_"));
 
         builder.build().unwrap().try_deserialize().unwrap()
