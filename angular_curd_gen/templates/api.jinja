@@ -15,22 +15,22 @@ export class {{ model_name }}Service {
   constructor(private http: HttpClient) {}
 
   getAll{{ models_name }}(): Observable<{{ model_name }}[]> {
-    return this.http.get<{{ model_name }}[]>(`${this.baseUrl}/`);
+    return this.http.get<{{ model_name }}[]>(`${this.baseUrl}`);
   }
 
   get{{ model_name }}ById(id: number): Observable<{{ model_name }}> {
-    return this.http.get<{{ model_name }}>(`${this.baseUrl}/${id}/`);
+    return this.http.get<{{ model_name }}>(`${this.baseUrl}/${id}`);
   }
 
   create{{ model_name }}(data: {{ create_model }}): Observable<{{ create_model }}> {
-    return this.http.post<{{ create_model }}>(`${this.baseUrl}/`, data);
+    return this.http.post<{{ create_model }}>(`${this.baseUrl}`, data);
   }
 
   update{{ model_name }}(id: number, data: {{ edit_model }}): Observable<{{ edit_model }}> {
-    return this.http.put<{{ edit_model }}>(`${this.baseUrl}/${id}/`, data);
+    return this.http.put<{{ edit_model }}>(`${this.baseUrl}/${id}`, data);
   }
 
   delete{{ model_name }}(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}/`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

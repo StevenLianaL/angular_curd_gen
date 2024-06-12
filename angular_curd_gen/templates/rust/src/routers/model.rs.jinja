@@ -10,8 +10,8 @@ use crate::utils::AppState;
 
 pub fn {{ lower_model_name }}_routes() -> Router<AppState> {
     Router::new()
-        .route("/{{ lower_models_name }}/", get(get_{{ lower_models_name }}_list).post(create_{{ lower_model_name }}))
-        .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id/", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
+        .route("/{{ lower_models_name }}", get(get_{{ lower_models_name }}_list).post(create_{{ lower_model_name }}))
+        .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
 }
 
 async fn get_{{ lower_models_name }}_list(state: State<AppState>) -> Response {
