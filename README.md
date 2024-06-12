@@ -50,7 +50,9 @@ npm install dayjs
 ```bash
 ng g environments # angular17
 # set backend: 'http://localhost:8000'
+
 ```
+- config icon
 - angular.json
 ```
 "styles": [
