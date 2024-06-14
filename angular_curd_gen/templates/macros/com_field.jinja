@@ -1,17 +1,30 @@
-{% macro gen_com_field(cls, models_name, field_name, field_type, fields_translate_map) -%}
+{% macro gen_com_field(cls, models_name, field_name, field_type, fields_translate_map, db_field_count, db_field_values) -%}
     {% set field_py_type = cls.extract_py_type(field_type) -%}
     {% set field_translate_name = fields_translate_map[field_name] -%}
-    {% if field_py_type=='str' -%}
-        <nz-col>
-                <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton{{ field_name|title }}">
-                        <input type="text" nz-input placeholder="搜索{{ field_translate_name }}" [(ngModel)]="query{{ field_name|title }}"/>
-                </nz-input-group>
-                <ng-template #suffixIconButton{{ field_name|title }}>
-                        <button nz-button nzType="primary" nzSearch>
-                            <span nz-icon nzType="search" (click)="get{{ models_name }}({{ cls.build_query_params()}})"></span>
-                        </button>
-                </ng-template>
-        </nz-col>
-    {%- else -%}
-    {%- endif %}
+    {% set field_count = db_field_count[field_name] -%}
+    {% set field_unique_values = db_field_values[field_name] -%}
+    {% if field_count>=10 %}
+        {% if field_py_type=='str' -%}
+            <nz-col>
+                    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton{{ field_name|title }}">
+                            <input type="text" nz-input placeholder="搜索{{ field_translate_name }}" [(ngModel)]="query{{ field_name|title }}"/>
+                    </nz-input-group>
+                    <ng-template #suffixIconButton{{ field_name|title }}>
+                            <button nz-button nzType="primary" nzSearch>
+                                <span nz-icon nzType="search" (click)="get{{ models_name }}({{ cls.build_query_params()}})"></span>
+                            </button>
+                    </ng-template>
+            </nz-col>
+        {%- else -%}
+        {%- endif %}
+    {% else %}
+    <nz-col>
+      <nz-select class="select-width" nzShowSearch nzAllowClear nzPlaceHolder="搜索{{ field_translate_name }}" [(ngModel)]="query{{ field_name|title }}" (ngModelChange)="get{{ models_name }}({{ cls.build_query_params()}})">
+          {% for value in field_unique_values -%}
+                <nz-option nzLabel="{{ value }}" nzValue="{{ value }}"></nz-option>
+          {% endfor -%}
+      </nz-select>
+    </nz-col>
+    {% endif %}
+
 {% endmacro %}

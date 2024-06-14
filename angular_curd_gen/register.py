@@ -28,6 +28,7 @@ class ModelRegister:
 
     db_list = []
     db_field_count = {}
+    db_field_values = {}
 
     # extract model info
     model_name = ''  # is single
@@ -95,14 +96,25 @@ class ModelRegister:
         }
         db = MySQLdb.connect(**db_config, cursorclass=DictCursor)
         cursor = db.cursor()
+
+        # data
         cursor.execute(f"select * from {self.models_name};")
         self.db_list = cursor.fetchall()
+
+        # field count
         sql = ("select " +
                ",".join([f"COUNT(DISTINCT {f}) AS {f}" for f in self.model_admin.model_fields])
                + f" from {self.models_name};")
         cursor.execute(sql)
         data = cursor.fetchone()
         self.db_field_count = data
+
+        # field unique values
+        for f in self.model_admin.model_fields:
+            sql = f"select {f} from {self.models_name};"
+            cursor.execute(sql)
+            values_data = cursor.fetchall()
+            self.db_field_values[f] = set([d[f] for d in values_data])
 
     def _load_template(self, name: str):
         return self.jinja_env.get_template(name)
@@ -219,7 +231,8 @@ class ModelRegister:
             'db_name': self.db_name,
             'db_user': self.db_user,
             'db_pswd': self.db_pswd,
-            'db_field_count': self.db_field_count
+            'db_field_count': self.db_field_count,
+            'db_field_values': self.db_field_values,
         }
         model_admin_context = {}
         for k in self.model_admin_fields:
