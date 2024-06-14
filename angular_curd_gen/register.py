@@ -1,3 +1,4 @@
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -46,6 +47,8 @@ class ModelRegister:
         gen_functions = [i for i in dir(self) if i.startswith('gen_')]
         for f in gen_functions:
             getattr(self, f)()
+
+        self._to_test_folder()
 
     def _prepare(self):
         # model
@@ -234,10 +237,15 @@ class ModelRegister:
         context = base_context | model_admin_context
         return context
 
-    def build_query_params(self, index: int, field: str):
-        params_list = ['undefined' for _ in range(len(self.model_admin.list_filter_fields))]
-        params_list[index] = field
+    def build_query_params(self):
+        context = self._build_context()
+        params_list = [f"query{f.title()}" for f in context['list_filter_fields_type_map'].keys()]
         return ', '.join(params_list)
+
+    def _to_test_folder(self):
+        """Copy all files to test folder"""
+        shutil.copytree(str(self.output_angular_dir), "W:/projects/work/ForCodeGen/src/app/first", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir / 'src'), "W:/rustProjects/web-base/src", dirs_exist_ok=True)
 
 
 @dataclass

@@ -27,7 +27,7 @@ async fn get_{{ lower_models_name }}(state: State<AppState>, Query(filter): Quer
         query = query.filter({{ lower_model_name }}::Column::{{ filter_field|title }}.{{ condition }}({{ filter_field }}));
     }
     {% endfor %}
-    let {{ lower_models_name }} = query.all(&state.conn).await.unwrap_or_else(|_| vec![]);
+    let {{ lower_models_name }} = query.all(&state.conn).await.unwrap();
     (StatusCode::OK, Json({{ lower_models_name }})).into_response()
 }
 

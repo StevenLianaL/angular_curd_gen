@@ -16,7 +16,7 @@ export class {{ model_name }}ListComponent implements OnInit {
   {{ models_list_var }}: {{ model_name }}[] = [];
 
   {% for field,field_type in list_filter_fields_type_map.items() %}
-      query{{ field|title }}?: {{ cls.map_ts_type(field_type) }}
+  query{{ field|title }}?: {{ cls.map_ts_type(field_type) }}
   {% endfor %}
 
 
@@ -36,6 +36,13 @@ export class {{ model_name }}ListComponent implements OnInit {
         this.msg.success('获取{{ model_readable_name }}列表成功');
       },
     });
+  }
+
+  getReset{{ models_name }}() {
+    {%- for field,field_type in list_filter_fields_type_map.items() %}
+    this.query{{ field|title }} = undefined;
+    {%- endfor %}
+    this.get{{ models_name }}();
   }
 
   delete{{ model_name }}(id: number): void {

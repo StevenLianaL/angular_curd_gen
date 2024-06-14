@@ -34,10 +34,10 @@
       <nz-divider></nz-divider>
       <nz-row>
           {% for field,field_type in list_filter_fields_type_map.items() -%}
-              <nz-col>{{ gen_com_field(cls,models_name,field,field_type,fields_translate_map,loop.index0) }}</nz-col>
-          {%- endfor %}
+            {{ gen_com_field(cls,models_name,field,field_type,fields_translate_map) }}
+          {% endfor %}
         <nz-col>
-          <button nz-button nzType="primary" nzShape="round" (click)="get{{ models_name }}()">重置查询</button>
+          <button nz-button nzType="primary" nzShape="round" (click)="getReset{{ models_name }}()">重置查询</button>
         </nz-col>
       </nz-row>
       <nz-divider></nz-divider>
