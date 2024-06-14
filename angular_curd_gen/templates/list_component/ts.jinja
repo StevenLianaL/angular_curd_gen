@@ -33,7 +33,11 @@ export class {{ model_name }}ListComponent implements OnInit {
     this.api.get{{ models_name }}({{ gen_list_filter_params_only(list_filter_fields_type_map) }}).subscribe({
       next: ({{ lower_models_name }}) => {
         this.{{ models_name }}List = {{ lower_models_name }};
-        this.msg.success('获取{{ model_readable_name }}列表成功');
+        if (users.length) {
+            this.msg.success('获取{{ model_readable_name }}列表成功');
+        } else {
+            this.msg.warning('获取{{ model_readable_name }}列表为空');
+        }
       },
     });
   }

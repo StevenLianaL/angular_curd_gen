@@ -4,7 +4,7 @@
     {% set field_count = db_field_count[field_name] -%}
     {% set field_unique_values = db_field_values[field_name] -%}
     {% if field_count>=10 %}
-        {% if field_py_type=='str' -%}
+        {% if field_py_type =='str' -%}
             <nz-col>
                     <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton{{ field_name|title }}">
                             <input type="text" nz-input placeholder="搜索{{ field_translate_name }}" [(ngModel)]="query{{ field_name|title }}"/>
@@ -14,6 +14,12 @@
                                 <span nz-icon nzType="search" (click)="get{{ models_name }}({{ cls.build_query_params()}})"></span>
                             </button>
                     </ng-template>
+            </nz-col>
+        {% elif field_py_type in ('int','float') %}
+            <nz-col>
+                   <nz-input-number-group nzPrefix="{{ field_translate_name }}" class="number-width">
+                        <nz-input-number [nzStep]="1" [(ngModel)]="query{{ field_name|title }}" (ngModelChange)="get{{ models_name }}({{ cls.build_query_params()}})"></nz-input-number>
+                   </nz-input-number-group>
             </nz-col>
         {%- else -%}
         {%- endif %}
@@ -26,5 +32,4 @@
       </nz-select>
     </nz-col>
     {% endif %}
-
 {% endmacro %}
