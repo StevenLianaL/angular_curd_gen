@@ -1,6 +1,10 @@
+use std::sync::{Arc};
+use redis::aio::MultiplexedConnection;
 use sea_orm::DatabaseConnection;
+use tokio::sync::Mutex as TokioMutex;
 
 #[derive(Clone)]
 pub struct AppState {
     pub conn: DatabaseConnection,
+    pub redis: Arc<TokioMutex<MultiplexedConnection>>,
 }

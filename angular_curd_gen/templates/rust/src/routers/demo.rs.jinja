@@ -1,0 +1,41 @@
+use axum::extract::{Query, State};
+use axum::{Json, Router};
+use axum::response::{IntoResponse, Response};
+use axum::routing::get;
+use redis::AsyncCommands;
+use axum::http::StatusCode;
+use crate::entities::demo::{RedisKey, RedisKeyValue};
+use crate::utils::AppState;
+
+pub fn demo_routes() -> Router<AppState> {
+    Router::new()
+        .route("/redis", get(get_by_redis).post(set_redis_key))
+}
+
+async fn get_by_redis(state: State<AppState>, Query(params): Query<RedisKey>) -> Response {
+    // get the value from Redis demo
+    let mut redis = state.redis.lock().await;
+    match redis.get::<_, Option<String>>(&params.key).await {
+        Ok(Some(value)) => (StatusCode::OK, value).into_response(),
+        Ok(None) => (
+            StatusCode::BAD_REQUEST,
+            format!("Key '{}' not found", params.key),
+        ).into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to get key '{}': {}", params.key, err),
+        ).into_response(),
+    }
+}
+
+async fn set_redis_key(state: State<AppState>, Json(payload): Json<RedisKeyValue>) -> Response {
+    // set the value to Redis demo
+    let mut redis = state.redis.lock().await;
+    match redis.set::<_, _, ()>(&payload.key, &payload.value).await {
+        Ok(_) => (StatusCode::CREATED, "Key set").into_response(),
+        Err(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to set key '{}':'{}' error:{}", payload.key, payload.value, err),
+        ).into_response(),
+    }
+}

@@ -7,6 +7,7 @@ pub struct Settings {
     pub debug: bool,
     pub port: u16,
     pub db: DatabaseSettings,
+    pub redis: RedisSettings,
 }
 
 #[derive(Debug, Deserialize)]
@@ -23,6 +24,18 @@ impl DatabaseSettings {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct RedisSettings {
+    pub host: String,
+    pub db: i32,
+    pub port: i32,
+}
+
+impl RedisSettings {
+    pub fn build_url(&self) -> String {
+        format!("redis://{}:{}/{}", self.host, self.port, self.db)
+    }
+}
 
 lazy_static! {
     pub static ref SETTINGS: Settings = {
@@ -30,10 +43,15 @@ lazy_static! {
             .set_default("debug", true).unwrap()
             .set_default("port", 8000).unwrap()
             .set_default("db.name", "{{ db_name }}").unwrap()
+            .set_default("redis.host", "127.0.0.1").unwrap()
+            .set_default("redis.port", 6379).unwrap()
+            .set_default("redis.db",0).unwrap()
             .add_source(Environment::with_prefix("PREFIX").separator("_"));
 
         builder.build().unwrap().try_deserialize().unwrap()
     };
 
     pub static ref DATABASE_URL: String = SETTINGS.db.build_url();
+    pub static ref REDIS_URL: String = SETTINGS.redis.build_url();
+
 }

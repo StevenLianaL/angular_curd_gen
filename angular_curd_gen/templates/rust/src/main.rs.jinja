@@ -4,10 +4,15 @@ pub mod routers;
 mod utils;
 
 use std::net::SocketAddr;
+use std::sync::Arc;
 use axum::{routing::get, Router};
+use redis::Client;
 use sea_orm::{Database};
 use tower_http::cors::{Any, CorsLayer};
-use crate::config::{DATABASE_URL, SETTINGS};
+use tokio::sync::Mutex as TokioMutex;
+
+use crate::config::{DATABASE_URL, REDIS_URL, SETTINGS};
+use crate::routers::demo::demo_routes;
 use crate::routers::{{ lower_model_name }}::{{ lower_model_name }}_routes;
 use crate::utils::AppState;
 
@@ -17,12 +22,16 @@ async fn main() {
     let conn = Database::connect(DATABASE_URL.as_str())
         .await
         .expect("Database connection failed");
+    let redis_client = Client::open(REDIS_URL.as_str()).expect("Invalid Redis URL");
+    let redis_connection = redis_client.get_multiplexed_async_connection().await.unwrap();
 
-    let state = AppState { conn };
+    let state = AppState { conn, redis: Arc::new(TokioMutex::new(redis_connection)) };
     let {{ lower_model_name }}_routers_with_state = {{ lower_model_name }}_routes().with_state(state.clone());
+    let demo_routers_with_state = demo_routes().with_state(state.clone());
     let app = Router::new()
         .route("/", get(|| async { "Hello, W!" }))
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
+        .nest("/demo", demo_routers_with_state)
         .layer(CorsLayer::new()
             .allow_origin(Any)
             .allow_methods(Any)

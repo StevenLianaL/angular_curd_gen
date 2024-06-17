@@ -16,3 +16,5 @@ serde = { version = "1.0.203", features = ["derive"] }
 
 sea-orm = { version = "0.12.15", features = ["sqlx-mysql", "runtime-async-std-native-tls", "macros"] }
 chrono = { version = "0.4.38", features = ["serde"] }
+
+redis= { version = "0.25.4", features = ["aio","tokio-comp"] }
