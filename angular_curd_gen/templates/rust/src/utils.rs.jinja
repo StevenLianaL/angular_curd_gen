@@ -5,6 +5,6 @@ use tokio::sync::Mutex as TokioMutex;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub conn: DatabaseConnection,
+    pub conn: Arc<TokioMutex<DatabaseConnection>>,
     pub redis: Arc<TokioMutex<MultiplexedConnection>>,
 }

@@ -25,7 +25,10 @@ async fn main() {
     let redis_client = Client::open(REDIS_URL.as_str()).expect("Invalid Redis URL");
     let redis_connection = redis_client.get_multiplexed_async_connection().await.unwrap();
 
-    let state = AppState { conn, redis: Arc::new(TokioMutex::new(redis_connection)) };
+    let state = AppState {
+        conn: Arc::new(TokioMutex::new(conn)),
+        redis: Arc::new(TokioMutex::new(redis_connection)),
+    };
     let {{ lower_model_name }}_routers_with_state = {{ lower_model_name }}_routes().with_state(state.clone());
     let demo_routers_with_state = demo_routes().with_state(state.clone());
     let app = Router::new()
