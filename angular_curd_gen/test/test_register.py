@@ -37,7 +37,7 @@ class UsersAdmin(ModelAdmin):
     model_fields = ('id', 'username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active', 'created')
     list_display_restraint = model_fields
     list_editable_restraint = ('username', 'gender')
-    list_filter_fields = ('id','username', 'role', 'gender', 'active', 'birthday')
+    list_filter_fields = ('id', 'username', 'role', 'gender', 'active', 'birthday')
     model_edit_fields = ('username', 'lastname', 'firstname', 'gender', 'birthday', 'active')
     model_create_fields = ('username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active')
     model_translate_fields = ('ID', '用户名', '姓氏', '名字', '性别', '生日', '角色', '是否激活', '创建时间')
@@ -54,7 +54,30 @@ class AppsAdmin(ModelAdmin):
     model_translate_fields = ('ID', '名称', 'AppKey', 'Secret', '生产者')
 
 
+class Game(BaseModel):
+    id: int
+    link: str
+    title: str
+    cover: str = None
+    views: int = None
+    created: datetime = None
+
+
+class GameAdmin:
+    """游戏信息管理注释文档信息"""
+    model_readable_name = '游戏信息'
+    model_fields = ('id', 'link', 'title', 'cover', 'views', 'created')
+    list_display_restraint = ('id', 'link', 'title', 'cover', 'views')
+    list_editable_restraint = ('link', 'title', 'cover', 'views')
+    list_filter_fields = ('title',)
+    model_edit_fields = ('link', 'title', 'views')
+    model_create_fields = model_edit_fields
+    model_translate_fields = ('ID', '游戏链接', '游戏名称', '游戏封面', '浏览次数')
+
+
 def test_register():
-    generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用',
-                       db_name='yd_user', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用',
+    #                    db_name='yd_user', db_user='test', db_pswd='test')
+    generate_whole_app(model_admin=GameAdmin, model=Game, app_name='game', app_readable_name='HGame',
+                       db_name='game_search', db_user='test', db_pswd='test')
     # generate_whole_app(model_admin=AppsAdmin, model=Apps, app_name='first', app_readable_name='纯应用')

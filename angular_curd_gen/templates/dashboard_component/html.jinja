@@ -22,10 +22,10 @@
           <li nz-list-item nzNoFlex>
             <ul nz-list-item-actions>
               <nz-list-item-action>
-                <a routerLink="/first/{{ left }}item{{ right }}/creator">添加</a>
+                <a routerLink="/{{ app_name }}/{{ left }}item{{ right }}/creator">添加</a>
               </nz-list-item-action>
             </ul>
-            <a routerLink="/first/{{ left }}item{{ right }}">{{ left }} modelsTranslations.get(item) {{ right }}</a>
+            <a routerLink="/{{ app_name }}/{{ left }}item{{ right }}">{{ left }} modelsTranslations.get(item) {{ right }}</a>
           </li>
         }
       </ul>
