@@ -1,3 +1,4 @@
+{% set left = '{{' -%}
 use axum::extract::State;
 use crate::config::SETTINGS;
 use crate::{entities};
@@ -5,7 +6,7 @@ use crate::utils::state;
 
 #[macro_export]
 macro_rules! func_name {
-    () => {{
+    () => {{ left }}
         fn f() {}
         fn type_name_of<T>(_: T) -> &'static str {
             std::any::type_name::<T>()

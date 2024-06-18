@@ -1,3 +1,2 @@
 {% from 'macros/rust_module.jinja' import gen_rust_module -%}
-{% set this_name="demo" %}
-{% macro gen_rust_module(this_name) %}
+{{ gen_rust_module("demo") }}
