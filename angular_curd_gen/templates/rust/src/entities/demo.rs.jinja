@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use bson::DateTime;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RedisKey {
@@ -12,13 +11,3 @@ pub struct RedisKeyValue {
     pub value: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct NewLogRecord {
-    pub app: String,
-    pub func: String,
-    pub log: String,
-    pub project: String,
-    pub user: i64,
-    pub level: String,
-    pub created: DateTime,
-}

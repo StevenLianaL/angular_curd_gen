@@ -1,0 +1,64 @@
+use axum::extract::State;
+use bson::{DateTime, doc};
+use mongodb::Collection;
+use mongodb::options::{FindOneAndUpdateOptions, ReturnDocument};
+use serde::{Deserialize, Serialize};
+use crate::config::SETTINGS;
+use crate::utils::state;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewLogRecord {
+    pub app: String,
+    pub func: String,
+    pub log: String,
+    pub project: String,
+    pub user: i64,
+    pub level: String,
+    pub created: DateTime,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AccessLog {
+    pub project: String,
+    pub app: String,
+    pub func: String, // method and uri name, because function name cannot get from request
+    count: i64,
+    month: String,
+}
+
+
+impl AccessLog {
+    pub fn new(project: String, app: String, func: String) -> Self {
+        let month = chrono::Utc::now().format("%Y-%m").to_string();
+
+        Self {
+            project,
+            app,
+            func,
+            count: 1,
+            month,
+        }
+    }
+    pub async fn increase(&self, state: State<state::AppState>) {
+        let mongo = state.mongo.lock().await;
+        let db = mongo.database(SETTINGS.mongo.name.as_str());
+        let collection: Collection<AccessLog> = db.collection("log_access");
+        let filter = doc! {
+            "project": &self.project,
+            "app": &self.app,
+            "func": &self.func,
+            "month": &self.month,
+        };
+
+        let update = doc! {
+            "$inc": { "count": 1 },
+        };
+
+        let options = FindOneAndUpdateOptions::builder()
+            .return_document(Some(ReturnDocument::After))
+            .upsert(true)
+            .build();
+
+        collection.find_one_and_update(filter, update, options).await.unwrap();
+    }
+}

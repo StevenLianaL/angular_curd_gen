@@ -6,7 +6,7 @@ pub mod modules;
 
 use std::net::SocketAddr;
 use std::sync::Arc;
-use axum::{routing::get, Router};
+use axum::{routing::get, Router, middleware};
 use mongodb::Client as MongoClient;
 use redis::Client as RedisClient;
 use sea_orm::{Database};
@@ -39,6 +39,7 @@ async fn main() {
         .route("/", get(|| async { "Hello, W!" }))
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
+        .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))
         .layer(CorsLayer::new()
             .allow_origin(Any)
             .allow_methods(Any)

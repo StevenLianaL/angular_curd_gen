@@ -1,4 +1,4 @@
-{% set left = '{{' -%}
+{% set left = "{{" -%}
 use axum::extract::State;
 use crate::config::SETTINGS;
 use crate::{entities};
@@ -32,7 +32,7 @@ impl MongoLogger {
         let mongo = state.mongo.lock().await;
         let db = mongo.database(SETTINGS.mongo.name.as_str());
         let collection = db.collection("log_record");
-        let payload = entities::demo::NewLogRecord {
+        let payload = entities::log::NewLogRecord {
             app: self.app.clone(),
             func: func.to_string(),
             log: log.to_string(),
@@ -41,7 +41,7 @@ impl MongoLogger {
             level: level.to_string(),
             created: bson::DateTime::now(),
         };
-        collection.insert_one(payload).await.unwrap();
+        collection.insert_one(payload, None).await.unwrap();
     }
 
     pub async fn info(&self, log: &str, user: i64, state: State<state::AppState>, func: &str) {

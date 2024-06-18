@@ -2,11 +2,13 @@ use config::{Config, Environment};
 use lazy_static::lazy_static;
 use crate::utils;
 
+pub static PROJECT: &str = "{{ app_title_name }}"; // only use when SETTINGS is not available
+
 lazy_static! {
     pub static ref SETTINGS: utils::settings::Settings = {
         let builder = Config::builder()
             .set_default("debug", true).unwrap()
-            .set_default("project", "{{ app_title_name }}").unwrap()
+            .set_default("project", PROJECT).unwrap()
             .set_default("port", 8000).unwrap()
             .set_default("db.name", "{{ db_name }}").unwrap()
             .set_default("db.port", 3306).unwrap()
