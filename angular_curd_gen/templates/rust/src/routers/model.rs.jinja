@@ -6,15 +6,15 @@ use axum::routing::{get};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use sea_orm::ActiveValue::Set;
 use crate::entities::{ {{ model_name }}, {{ lower_model_name }}};
-use crate::temp::AppState;
+use crate::utils::state;
 
-pub fn {{ lower_model_name }}_routes() -> Router<AppState> {
+pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
     Router::new()
         .route("/{{ lower_models_name }}", get(get_{{ lower_models_name }}).post(create_{{ lower_model_name }}))
         .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
 }
 
-async fn get_{{ lower_models_name }}(state: State<AppState>, Query(filter): Query<{{ lower_model_name }}::{{ model_name }}Filter>) -> Response {
+async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter): Query<{{ lower_model_name }}::{{ model_name }}Filter>) -> Response {
     let conn = state.conn.lock().await;
     let mut query = {{ model_name }}::find();
 
@@ -32,13 +32,13 @@ async fn get_{{ lower_models_name }}(state: State<AppState>, Query(filter): Quer
     (StatusCode::OK, Json({{ lower_models_name }})).into_response()
 }
 
-async fn get_{{ lower_model_name }}(state: State<AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> Response {
+async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> Response {
     let conn = state.conn.lock().await;
     let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();
     (StatusCode::OK, Json({{ lower_model_name }})).into_response()
 }
 
-async fn create_{{ lower_model_name }}(state: State<AppState>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Creatable>) -> Response {
+async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Creatable>) -> Response {
     let conn = state.conn.lock().await;
     let new_{{ lower_model_name }} = {{ lower_model_name }}::ActiveModel {
     {%- for field,field_type in model_create_fields_type_map.items() %}
@@ -50,19 +50,19 @@ async fn create_{{ lower_model_name }}(state: State<AppState>, Json(payload): Js
     (StatusCode::CREATED, Json({{ lower_model_name }})).into_response()
 }
 
-async fn update_{{ lower_model_name }}(state: State<AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Editable>) -> impl IntoResponse {
+async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Editable>) -> impl IntoResponse {
     let conn = state.conn.lock().await;
     let raw_{{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();
     let mut {{ lower_model_name }}: {{ lower_model_name }}::ActiveModel = raw_{{ lower_model_name }}.into();
     {%- for field,field_type in model_edit_fields_type_map.items() %}
-        {{ lower_model_name }}.{{ field }} = Set(payload.{{ field }}.to_owned());
+    {{ lower_model_name }}.{{ field }} = Set(payload.{{ field }}.to_owned());
     {%- endfor %}
     let updated_{{ lower_model_name }}: {{ lower_model_name }}::Model = {{ lower_model_name }}.update(&*conn).await.unwrap();
     (StatusCode::OK, Json(updated_{{ lower_model_name }})).into_response()
 }
 
 
-async fn delete_{{ lower_model_name }}(state: State<AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
+async fn delete_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
     let conn = state.conn.lock().await;
     let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();
     {{ lower_model_name }}.delete(&*conn).await.unwrap();

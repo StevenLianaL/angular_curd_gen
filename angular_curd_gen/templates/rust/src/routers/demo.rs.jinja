@@ -6,15 +6,15 @@ use redis::AsyncCommands;
 use axum::http::StatusCode;
 use crate::config::SETTINGS;
 use crate::entities::demo::{NewLogRecord, RedisKey, RedisKeyValue};
-use crate::temp::AppState;
+use crate::utils::state;
 
-pub fn demo_routes() -> Router<AppState> {
+pub fn demo_routes() -> Router<state::AppState> {
     Router::new()
         .route("/redis", get(get_by_redis).post(set_redis_key))
         .route("/mongo", post(set_mongo_record))
 }
 
-async fn get_by_redis(state: State<AppState>, Query(params): Query<RedisKey>) -> Response {
+async fn get_by_redis(state: State<state::AppState>, Query(params): Query<RedisKey>) -> Response {
     // get the value from Redis demo
     let mut redis = state.redis.lock().await;
     match redis.get::<_, Option<String>>(&params.key).await {
@@ -30,7 +30,7 @@ async fn get_by_redis(state: State<AppState>, Query(params): Query<RedisKey>) ->
     }
 }
 
-async fn set_redis_key(state: State<AppState>, Json(payload): Json<RedisKeyValue>) -> Response {
+async fn set_redis_key(state: State<state::AppState>, Json(payload): Json<RedisKeyValue>) -> Response {
     // set the value to Redis demo
     let mut redis = state.redis.lock().await;
     match redis.set::<_, _, ()>(&payload.key, &payload.value).await {
@@ -43,7 +43,7 @@ async fn set_redis_key(state: State<AppState>, Json(payload): Json<RedisKeyValue
 }
 
 
-async fn set_mongo_record(state: State<AppState>) -> Response {
+async fn set_mongo_record(state: State<state::AppState>) -> Response {
     // set the value to Mongo demo
     let mongo = state.mongo.lock().await;
     let db = mongo.database(SETTINGS.mongo.name.as_str());
