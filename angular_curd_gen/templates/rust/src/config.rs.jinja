@@ -1,12 +1,14 @@
 use config::{Config, Environment};
 use lazy_static::lazy_static;
 use serde::Deserialize;
+use crate::utils::db::RedisSettings;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub debug: bool,
     pub port: u16,
     pub db: DatabaseSettings,
+    pub mongo: DatabaseSettings,
     pub redis: RedisSettings,
 }
 
@@ -16,26 +18,9 @@ pub struct DatabaseSettings {
     pub pswd: String,
     pub host: String,
     pub name: String,
-}
-
-impl DatabaseSettings {
-    pub fn build_url(&self) -> String {
-        format!("mysql://{}:{}@{}:3306/{}", self.user, self.pswd, self.host, self.name)
-    }
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RedisSettings {
-    pub host: String,
-    pub db: i32,
     pub port: i32,
 }
 
-impl RedisSettings {
-    pub fn build_url(&self) -> String {
-        format!("redis://{}:{}/{}", self.host, self.port, self.db)
-    }
-}
 
 lazy_static! {
     pub static ref SETTINGS: Settings = {
@@ -43,6 +28,12 @@ lazy_static! {
             .set_default("debug", true).unwrap()
             .set_default("port", 8000).unwrap()
             .set_default("db.name", "{{ db_name }}").unwrap()
+            .set_default("db.port", 3306).unwrap()
+            .set_default("mongo.host", "localhost").unwrap()
+            .set_default("mongo.port", 27017).unwrap()
+            .set_default("mongo.name", "record").unwrap()
+            .set_default("mongo.user", "test").unwrap()
+            .set_default("mongo.pswd", "test").unwrap()
             .set_default("redis.host", "127.0.0.1").unwrap()
             .set_default("redis.port", 6379).unwrap()
             .set_default("redis.db",0).unwrap()
@@ -51,7 +42,7 @@ lazy_static! {
         builder.build().unwrap().try_deserialize().unwrap()
     };
 
-    pub static ref DATABASE_URL: String = SETTINGS.db.build_url();
+    pub static ref DATABASE_URL: String = SETTINGS.db.build_url("mysql");
+    pub static ref MONGO_URL: String = format!("{}?authSource=admin", SETTINGS.mongo.build_url("mongodb"));
     pub static ref REDIS_URL: String = SETTINGS.redis.build_url();
-
 }

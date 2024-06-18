@@ -1,20 +1,23 @@
 mod config;
+pub mod utils;
 pub mod entities;
 pub mod routers;
-mod utils;
+mod temp;
+
 
 use std::net::SocketAddr;
 use std::sync::Arc;
 use axum::{routing::get, Router};
-use redis::Client;
+use mongodb::Client as MongoClient;
+use redis::Client as RedisClient;
 use sea_orm::{Database};
 use tower_http::cors::{Any, CorsLayer};
 use tokio::sync::Mutex as TokioMutex;
 
-use crate::config::{DATABASE_URL, REDIS_URL, SETTINGS};
+use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL, SETTINGS};
 use crate::routers::demo::demo_routes;
 use crate::routers::{{ lower_model_name }}::{{ lower_model_name }}_routes;
-use crate::utils::AppState;
+use crate::temp::AppState;
 
 
 #[tokio::main]
@@ -22,12 +25,16 @@ async fn main() {
     let conn = Database::connect(DATABASE_URL.as_str())
         .await
         .expect("Database connection failed");
-    let redis_client = Client::open(REDIS_URL.as_str()).expect("Invalid Redis URL");
+    let redis_client = RedisClient::open(REDIS_URL.as_str()).expect("Invalid Redis URL");
     let redis_connection = redis_client.get_multiplexed_async_connection().await.unwrap();
+
+
+    let mongo_client = MongoClient::with_uri_str(MONGO_URL.as_str()).await.expect("failed to connect");
 
     let state = AppState {
         conn: Arc::new(TokioMutex::new(conn)),
         redis: Arc::new(TokioMutex::new(redis_connection)),
+        mongo: Arc::new(TokioMutex::new(mongo_client)),
     };
     let {{ lower_model_name }}_routers_with_state = {{ lower_model_name }}_routes().with_state(state.clone());
     let demo_routers_with_state = demo_routes().with_state(state.clone());
