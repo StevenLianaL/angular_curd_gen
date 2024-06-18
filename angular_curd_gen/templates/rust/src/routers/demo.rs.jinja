@@ -4,8 +4,8 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use redis::AsyncCommands;
 use axum::http::StatusCode;
-use crate::config::SETTINGS;
-use crate::entities::demo::{NewLogRecord, RedisKey, RedisKeyValue};
+use crate::entities::demo::{RedisKey, RedisKeyValue};
+use crate::modules::demo::MODULE_LOGGER;
 use crate::utils::state;
 
 pub fn demo_routes() -> Router<state::AppState> {
@@ -42,26 +42,8 @@ async fn set_redis_key(state: State<state::AppState>, Json(payload): Json<RedisK
     }
 }
 
-
 async fn set_mongo_record(state: State<state::AppState>) -> Response {
     // set the value to Mongo demo
-    let mongo = state.mongo.lock().await;
-    let db = mongo.database(SETTINGS.mongo.name.as_str());
-    let collection = db.collection("log_record");
-    let payload = NewLogRecord {
-        app: "demo".to_string(),
-        func: "set_mongo_record".to_string(),
-        log: "set_mongo_record".to_string(),
-        project: "demo".to_string(),
-        user: 1,
-        level: "info".to_string(),
-        created: bson::DateTime::now(),
-    };
-    match collection.insert_one(payload).await {
-        Ok(_) => (StatusCode::CREATED, "Record inserted").into_response(),
-        Err(err) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Failed to insert record: {}", err),
-        ).into_response(),
-    }
+    MODULE_LOGGER.info(state, "set_mongo_record", "set_mongo_record", 1).await;
+    (StatusCode::CREATED, "Record set").into_response()
 }

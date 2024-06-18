@@ -1,0 +1,17 @@
+use serde::Deserialize;
+use crate::utils;
+
+#[derive(Debug, Deserialize)]
+pub struct Settings {
+    pub debug: bool,
+    pub project: String,
+    pub port: u16,
+    pub db: utils::db::DatabaseSettings,
+    pub mongo: utils::db::DatabaseSettings,
+    pub redis: utils::db::RedisSettings,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ModuleSettings {
+    pub name: String,
+}

@@ -1,5 +1,13 @@
 use serde::Deserialize;
-use crate::config::DatabaseSettings;
+
+#[derive(Debug, Deserialize)]
+pub struct DatabaseSettings {
+    pub user: String,
+    pub pswd: String,
+    pub host: String,
+    pub name: String,
+    pub port: i32,
+}
 
 impl DatabaseSettings {
     pub fn build_url(&self, db: &str) -> String {

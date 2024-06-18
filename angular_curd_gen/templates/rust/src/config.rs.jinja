@@ -1,31 +1,12 @@
 use config::{Config, Environment};
 use lazy_static::lazy_static;
-use serde::Deserialize;
-use crate::utils::db::RedisSettings;
-
-#[derive(Debug, Deserialize)]
-pub struct Settings {
-    pub debug: bool,
-    pub port: u16,
-    pub db: DatabaseSettings,
-    pub mongo: DatabaseSettings,
-    pub redis: RedisSettings,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct DatabaseSettings {
-    pub user: String,
-    pub pswd: String,
-    pub host: String,
-    pub name: String,
-    pub port: i32,
-}
-
+use crate::utils;
 
 lazy_static! {
-    pub static ref SETTINGS: Settings = {
+    pub static ref SETTINGS: utils::settings::Settings = {
         let builder = Config::builder()
             .set_default("debug", true).unwrap()
+            .set_default("project", "{{ app_title_name }}").unwrap()
             .set_default("port", 8000).unwrap()
             .set_default("db.name", "{{ db_name }}").unwrap()
             .set_default("db.port", 3306).unwrap()
