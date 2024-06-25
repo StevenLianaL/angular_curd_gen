@@ -14,7 +14,6 @@ from angular_curd_gen.config import TEMPLATE_DIR, BACKEND_TEMPLATE_DIR, FRONTEND
 
 @dataclass
 class ModelRegister:
-    """"""
     model_admin: ModelAdmin = None
     model: BaseModel = None
 

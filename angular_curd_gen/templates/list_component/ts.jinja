@@ -60,4 +60,11 @@ export class {{ model_name }}ListComponent implements OnInit {
 
   giveUpDelete{{ model_name }}(): void {
   }
+
+  {% for field in list_sort_fields %}
+  // @ts-ignore
+  sort{{ model_name|title }}{{ field|title }}(a, b) {
+      return a.{{ field }} - b.{{ field }}
+  }
+  {% endfor %}
 }

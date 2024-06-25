@@ -70,6 +70,7 @@ class GameAdmin:
     list_display_restraint = ('id', 'link', 'title', 'cover', 'views')
     list_editable_restraint = ('link', 'title', 'cover', 'views')
     list_filter_fields = ('title',)
+    list_sort_fields = ('views',)
     model_edit_fields = ('link', 'title', 'views')
     model_create_fields = model_edit_fields
     model_translate_fields = ('ID', '游戏链接', '游戏名称', '游戏封面', '浏览次数')

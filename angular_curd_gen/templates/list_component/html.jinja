@@ -44,10 +44,14 @@
     <nz-table #{{ table_name }} [nzData]="{{ model_list }}"  [nzPageSize]="50">
       <thead>
         <tr>
-            {% for tf in list_display_restraint_translate -%}
-                <th>{{ tf }}</th>
-            {% endfor -%}
-            <th>action</th>
+        {% for tf in list_display_restraint -%}
+        {% if tf in list_sort_fields -%}
+        <th [nzSortFn]="sort{{ model_name|title }}{{ tf|title }}">{{ fields_translate_map[tf] }}</th>
+        {% else -%}
+        <th>{{ fields_translate_map[tf] }}</th>
+        {% endif -%}
+        {% endfor -%}
+        <th>action</th>
         </tr>
       </thead>
       <tbody>
