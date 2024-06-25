@@ -62,6 +62,14 @@
                   <span *ngSwitchCase="true" nz-icon nzType="check-circle" nzTheme="twotone"></span>
                   <span *ngSwitchCase="false" nz-icon nzType="close-circle" nzTheme="twotone" [twoToneColor]="'red'"></span>
                 </td>
+                {%- elif cls.extract_py_type(ldf_type)=='Image' -%}
+                <td><img
+                    nz-image
+                    width="200px"
+                    height="200px"
+                    [nzSrc]="data.{{ ldf }}"
+                    alt=""/>
+                </td>
                 {%- else -%}
                     <td>{{ left }}data.{{ ldf }}{{ right }}</td>
                 {%- endif %}

@@ -3,6 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from angular_curd_gen.admin import Image
 from angular_curd_gen.register import ModelAdmin, generate_whole_app
 
 
@@ -58,7 +59,7 @@ class Game(BaseModel):
     id: int
     link: str
     title: str
-    cover: str = None
+    cover: Image
     views: int = None
     created: datetime = None
 

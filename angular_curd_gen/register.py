@@ -163,8 +163,9 @@ class ModelRegister:
         type_str = parse("<class '{type}'>", str(t))
         if not type_str:  # option
             type_str = parse("typing.Optional[{type}]", str(t))
-
         the_type = type_str.named['type']
+        if '.' in the_type:
+            the_type = the_type.split('.')[-1]
         return the_type
 
     def map_ts_type(self, t):
@@ -173,13 +174,14 @@ class ModelRegister:
         match the_type:
             case 'int' | 'float':
                 return 'number'
-            case 'str':
+            case 'str' | "Image":
                 return 'string'
             case 'bool':
                 return 'boolean'
-            case 'datetime.datetime' | 'datetime.date':
+            case 'datetime' | 'date':
                 return 'Date'
             case _:
+                print(the_type, 't')
                 raise ValueError(f"not support type {t}")
 
     def map_ts_type_default(self, t):
@@ -187,11 +189,11 @@ class ModelRegister:
         match the_type:
             case 'int' | 'float':
                 return '0'
-            case 'str':
+            case 'str' | 'Image':
                 return "''"
             case 'bool':
                 return 'null'
-            case 'datetime.datetime' | 'datetime.date':
+            case 'datetime' | 'date':
                 return 'null'
             case _:
                 raise ValueError(f"not support type {t}")
@@ -204,13 +206,13 @@ class ModelRegister:
                 return 'i64'
             case 'float':
                 return 'f64'
-            case 'str':
+            case 'str' | "Image":
                 return 'String'
             case 'bool':
                 return 'bool'
-            case 'datetime.datetime':
+            case 'datetime':
                 return 'DateTime'
-            case 'datetime.date':
+            case '  date':
                 return 'NaiveDate'
             case _:
                 raise ValueError(f"not support type {t}")
