@@ -1,7 +1,7 @@
 {% set service_name = model_name+'Service' -%}
 {% set component_name = model_name+'UpdaterComponent' -%}
 {% set update_form_name = 'update'+ model_name +'Form' -%}
-{% set modelId = lower_model_name+'Id' -%}
+{% set modelId = lower_model_camel_name +'Id' -%}
 
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
@@ -23,7 +23,7 @@ export class {{ component_name }} implements OnInit {
 
   {{ modelId }}: number = 0;
   // @ts-ignore
-  {{ lower_model_name }}: {{ model_name }}
+  {{ lower_model_camel_name }}: {{ model_name }}
 
   {{ update_form_name }}: FormGroup = new FormGroup({});
 
@@ -48,7 +48,7 @@ export class {{ component_name }} implements OnInit {
     this.{{ modelId }} = this.route.snapshot.paramMap.get('{{ modelId }}');
     this.api.get{{ model_name }}ById(this.{{ modelId }}).subscribe({
       next: ({{ lower_model_name }}) => {
-        this.{{ lower_model_name }} = {{ lower_model_name }};
+        this.{{ lower_model_camel_name }} = {{ lower_model_name }};
         this.initBaseForm({{ lower_model_name }});
       }
     });

@@ -16,7 +16,7 @@ export class {{ model_name }}ListComponent implements OnInit {
   {{ models_list_var }}: {{ model_name }}[] = [];
 
   {% for field,field_type in list_filter_fields_type_map.items() %}
-  query{{ field|title }}?: {{ cls.map_ts_type(field_type) }}
+  query{{ field| to_camel }}?: {{ cls.map_ts_type(field_type) }}
   {% endfor %}
 
 
@@ -44,7 +44,7 @@ export class {{ model_name }}ListComponent implements OnInit {
 
   getReset{{ models_name }}() {
     {%- for field,field_type in list_filter_fields_type_map.items() %}
-    this.query{{ field|title }} = undefined;
+    this.query{{ field| to_camel }} = undefined;
     {%- endfor %}
     this.get{{ models_name }}();
   }
@@ -63,7 +63,7 @@ export class {{ model_name }}ListComponent implements OnInit {
 
   {% for field in list_sort_fields %}
   // @ts-ignore
-  sort{{ model_name }}{{ field|title }}(a, b) {
+  sort{{ model_name }}{{ field|to_camel }}(a, b) {
       return a.{{ field }} - b.{{ field }}
   }
   {% endfor %}

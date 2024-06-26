@@ -61,6 +61,7 @@ class ModelRegister:
 
         self.lower_model_name = FieldUtil.camel_to_snake(self.model_name)
         self.lower_models_name = FieldUtil.camel_to_snake(self.models_name)
+        self.lower_model_camel_name = FieldUtil.snake_to_camel_lower(self.lower_model_name)
 
         self.model_fields_map = self.model.__dict__['__annotations__']
 
@@ -73,6 +74,7 @@ class ModelRegister:
         loader = FileSystemLoader(TEMPLATE_DIR)
         self.jinja_env = Environment(loader=loader)
         self.jinja_env.filters['to_camel'] = FieldUtil.snake_to_camel
+        self.jinja_env.filters['to_lower_camel'] = FieldUtil.snake_to_camel_lower
 
         self.out_app_dir = Path(f"{self.app_name}")
 
@@ -226,6 +228,7 @@ class ModelRegister:
             'model_name': self.model_name,
             'models_name': self.models_name,
             'lower_models_name': self.lower_models_name,
+            'lower_model_camel_name': self.lower_model_camel_name,
             'lower_model_name': self.lower_model_name,
             'fields_map': self.model_fields_map,
             'fields_translate_map': dict(zip(self.model_admin.model_fields, self.model_admin.model_translate_fields)),
@@ -254,7 +257,7 @@ class ModelRegister:
 
     def build_query_params(self):
         context = self._build_context()
-        params_list = [f"query{f.title()}" for f in context['list_filter_fields_type_map'].keys()]
+        params_list = [f"query{FieldUtil.snake_to_camel(f)}" for f in context['list_filter_fields_type_map'].keys()]
         return ', '.join(params_list)
 
     def _to_test_folder(self):

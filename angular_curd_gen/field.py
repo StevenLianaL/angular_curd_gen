@@ -30,3 +30,7 @@ class FieldUtil:
     @staticmethod
     def snake_to_camel(name: str) -> str:
         return inflection.camelize(name)
+
+    @staticmethod
+    def snake_to_camel_lower(name: str) -> str:
+        return inflection.camelize(name, False)

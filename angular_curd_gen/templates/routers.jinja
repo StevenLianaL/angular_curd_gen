@@ -14,7 +14,7 @@ const routes: Routes = [
   {path: '', component: {{ dashboard_component_name }}},
   {path: '{{ lower_models_name }}', component: {{ list_component_name }}},
   {path: '{{ lower_models_name }}/creator', component: {{ creator_component_name }}},
-  {path: '{{ lower_models_name }}/:{{ lower_model_name }}Id/updater', component: {{ updater_component_name }}},
+  {path: '{{ lower_models_name }}/:{{ lower_model_camel_name }}Id/updater', component: {{ updater_component_name }}},
 ];
 
 @NgModule({

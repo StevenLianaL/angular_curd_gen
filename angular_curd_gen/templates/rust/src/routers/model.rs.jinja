@@ -30,7 +30,7 @@ async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter
         {% set condition = "eq" -%}
     {% endif -%}
     if let Some({{ filter_field }}) = filter.{{ filter_field }} {
-        query = query.filter({{ lower_model_name }}::Column::{{ filter_field|title }}.{{ condition }}({{ filter_field }}));
+        query = query.filter({{ lower_model_name }}::Column::{{ filter_field | to_camel }}.{{ condition }}({{ filter_field }}));
     }
     {% endfor %}
     let {{ lower_models_name }} = query.all(&*conn).await.unwrap();

@@ -1,6 +1,6 @@
 {% from 'macros/form_field.jinja' import gen_form_field -%}
 {% set update_form_name = 'update'+ model_name +'Form' -%}
-<div class="page" *ngIf="{{ lower_model_name }}">
+<div class="page" *ngIf="{{ lower_model_camel_name }}">
     <nz-row>
         <nz-col nzSpan="3">
             <h2 nz-typography>更新{{ model_readable_name }}</h2>

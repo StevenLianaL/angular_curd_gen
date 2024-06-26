@@ -58,21 +58,21 @@ class AppsAdmin(ModelAdmin):
 class GameInfo(BaseModel):
     id: int
     link: Url
-    title: str
+    game_title: str
     cover: Image
-    views: int = None
+    user_views: int = None
     created: datetime = None
 
 
 class GameInfoAdmin:
     """游戏信息管理注释文档信息"""
     model_readable_name = '游戏信息'
-    model_fields = ('id', 'link', 'title', 'cover', 'views', 'created')
-    list_display_restraint = ('id', 'link', 'title', 'cover', 'views')
-    list_editable_restraint = ('link', 'title', 'cover', 'views')
-    list_filter_fields = ('title',)
-    list_sort_fields = ('views',)
-    model_edit_fields = ('link', 'title', 'views')
+    model_fields = ('id', 'link', 'game_title', 'cover', 'user_views', 'created')
+    list_display_restraint = ('id', 'link', 'game_title', 'cover', 'user_views')
+    list_editable_restraint = ('link', 'game_title', 'cover', 'user_views')
+    list_filter_fields = ('game_title',)
+    list_sort_fields = ('user_views',)
+    model_edit_fields = ('link', 'game_title', 'user_views')
     model_create_fields = model_edit_fields
     model_translate_fields = ('ID', '游戏链接', '游戏名称', '游戏封面', '浏览次数')
 
