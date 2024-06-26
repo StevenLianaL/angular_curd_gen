@@ -98,20 +98,20 @@ class ModelRegister:
         cursor = db.cursor()
 
         # data
-        cursor.execute(f"select * from {self.models_name};")
+        cursor.execute(f"select * from {self.lower_models_name};")
         self.db_list = cursor.fetchall()
 
         # field count
         sql = ("select " +
                ",".join([f"COUNT(DISTINCT {f}) AS {f}" for f in self.model_admin.model_fields])
-               + f" from {self.models_name};")
+               + f" from {self.lower_models_name};")
         cursor.execute(sql)
         data = cursor.fetchone()
         self.db_field_count = data
 
         # field unique values
         for f in self.model_admin.model_fields:
-            sql = f"select {f} from {self.models_name};"
+            sql = f"select {f} from {self.lower_models_name};"
             cursor.execute(sql)
             values_data = cursor.fetchall()
             self.db_field_values[f] = set([d[f] for d in values_data])
