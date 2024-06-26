@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from MySQLdb.cursors import DictCursor
 from angular_curd_gen.admin import ModelAdmin
 from angular_curd_gen.config import TEMPLATE_DIR, BACKEND_TEMPLATE_DIR, FRONTEND_TEMPLATE_DIR
+from angular_curd_gen.field import FieldUtil
 
 
 @dataclass
@@ -52,15 +53,14 @@ class ModelRegister:
 
     def _prepare(self):
         # model
-        engine = inflect.engine()
 
         self.app_title_name = self.app_name.title()
 
-        self.model_name = engine.singular_noun(self.model.__name__) or self.model.__name__
-        self.models_name = engine.plural(self.model_name)
+        self.model_name = FieldUtil.to_singular(self.model.__name__)
+        self.models_name = FieldUtil.to_plural(self.model_name)
 
-        self.lower_model_name = self.model_name.lower()
-        self.lower_models_name = self.models_name.lower()
+        self.lower_model_name = FieldUtil.camel_to_snake(self.model_name)
+        self.lower_models_name = FieldUtil.camel_to_snake(self.models_name)
 
         self.model_fields_map = self.model.__dict__['__annotations__']
 
@@ -72,6 +72,7 @@ class ModelRegister:
         # template
         loader = FileSystemLoader(TEMPLATE_DIR)
         self.jinja_env = Environment(loader=loader)
+        self.jinja_env.filters['to_camel'] = FieldUtil.snake_to_camel
 
         self.out_app_dir = Path(f"{self.app_name}")
 

@@ -1,6 +1,3 @@
-from pydantic import BaseModel
-
-
 class ModelAdmin:
     # model
     model_readable_name = ''  # model readable name, if not, use model name
@@ -13,11 +10,3 @@ class ModelAdmin:
     model_edit_fields = ()  # can edit in detail page
     model_create_fields = ()  # can create in create page
     model_translate_fields = ()  # translate model fields to human readable
-
-
-class Image(BaseModel):
-    pass
-
-
-class Url(BaseModel):
-    pass

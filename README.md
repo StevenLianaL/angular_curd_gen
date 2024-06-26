@@ -1,10 +1,15 @@
 ## Install
 
+## Name Rule
+- app_name: snake case
+- model_name: camel case single/plural
+- field_name: snake case
+
 ## Usage
 - generate angular codes
 ```python
-# declare model by pydantic
-class Users(BaseModel):
+# declare model by pydantic, must single(User) not plural(Users)
+class User(BaseModel):
     id: int
     username: str
     password: Optional[str] = None
@@ -21,7 +26,7 @@ class Users(BaseModel):
     created: datetime
 
 # declare model admin
-class UsersAdmin(ModelAdmin):
+class UserAdmin(ModelAdmin):
     model_fields = ('id', 'username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active', 'created')
     list_display_restraint = model_fields
     list_editable_restraint = ('username', 'gender')
@@ -30,7 +35,7 @@ class UsersAdmin(ModelAdmin):
     model_translate_fields = ('ID', '用户名', '姓氏', '名字', '性别', '生日', '角色', '是否激活', '创建时间')
 
 # generate angular codes
-mr = ModelRegister(model_admin=UsersAdmin, model=Users, app_name='first')
+mr = ModelRegister(model_admin=UserAdmin, model=User, app_name='first')
 mr.register()
 
 # copy all files to angular src/app

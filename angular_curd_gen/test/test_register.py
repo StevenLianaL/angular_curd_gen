@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from angular_curd_gen.admin import Image, Url
+from angular_curd_gen.field import Image, Url
 from angular_curd_gen.register import ModelAdmin, generate_whole_app
 
 

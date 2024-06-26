@@ -3,3 +3,4 @@ parse==1.20.1
 pydantic==2.7.3
 inflect==7.2.1
 mysqlclient==2.2.4
+inflection==0.5.1
