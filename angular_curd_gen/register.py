@@ -269,17 +269,17 @@ class AngularModelRegister(ModelRegister):
 
     def gen_a_interface(self):
         template = 'interfaces.jinja'
-        target = f"{self.model_name}/{self.lower_model_name}_interfaces.ts"
+        target = f"{self.lower_model_name}/{self.lower_model_name}_interfaces.ts"
         self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_b_api(self):
         template = 'api.jinja'
-        target = f"{self.model_name}/{self.lower_model_name}_api.service.ts"
+        target = f"{self.lower_model_name}/{self.lower_model_name}_api.service.ts"
         self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_b1_api_spec(self):
         template = 'api.spec.jinja'
-        target = f"{self.model_name}/{self.lower_model_name}_api.service.spec.ts"
+        target = f"{self.lower_model_name}/{self.lower_model_name}_api.service.spec.ts"
         self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_c_module(self):

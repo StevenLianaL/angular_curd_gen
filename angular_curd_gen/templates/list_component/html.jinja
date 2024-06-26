@@ -46,7 +46,7 @@
         <tr>
         {% for tf in list_display_restraint -%}
         {% if tf in list_sort_fields -%}
-        <th [nzSortFn]="sort{{ model_name|title }}{{ tf|title }}">{{ fields_translate_map[tf] }}</th>
+        <th [nzSortFn]="sort{{ model_name }}{{ tf|title }}">{{ fields_translate_map[tf] }}</th>
         {% else -%}
         <th>{{ fields_translate_map[tf] }}</th>
         {% endif -%}

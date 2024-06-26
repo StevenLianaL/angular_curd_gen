@@ -63,7 +63,7 @@ export class {{ model_name }}ListComponent implements OnInit {
 
   {% for field in list_sort_fields %}
   // @ts-ignore
-  sort{{ model_name|title }}{{ field|title }}(a, b) {
+  sort{{ model_name }}{{ field|title }}(a, b) {
       return a.{{ field }} - b.{{ field }}
   }
   {% endfor %}

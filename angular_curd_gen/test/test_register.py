@@ -55,7 +55,7 @@ class AppsAdmin(ModelAdmin):
     model_translate_fields = ('ID', '名称', 'AppKey', 'Secret', '生产者')
 
 
-class Game(BaseModel):
+class GameInfo(BaseModel):
     id: int
     link: Url
     title: str
@@ -64,7 +64,7 @@ class Game(BaseModel):
     created: datetime = None
 
 
-class GameAdmin:
+class GameInfoAdmin:
     """游戏信息管理注释文档信息"""
     model_readable_name = '游戏信息'
     model_fields = ('id', 'link', 'title', 'cover', 'views', 'created')
@@ -80,6 +80,6 @@ class GameAdmin:
 def test_register():
     # generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用',
     #                    db_name='yd_user', db_user='test', db_pswd='test')
-    generate_whole_app(model_admin=GameAdmin, model=Game, app_name='game', app_readable_name='HGame',
+    generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
                        db_name='game_search', db_user='test', db_pswd='test')
     # generate_whole_app(model_admin=AppsAdmin, model=Apps, app_name='first', app_readable_name='纯应用')
