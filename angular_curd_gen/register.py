@@ -174,7 +174,7 @@ class ModelRegister:
         match the_type:
             case 'int' | 'float':
                 return 'number'
-            case 'str' | "Image":
+            case 'str' | 'Image' | 'Url':
                 return 'string'
             case 'bool':
                 return 'boolean'
@@ -189,7 +189,7 @@ class ModelRegister:
         match the_type:
             case 'int' | 'float':
                 return '0'
-            case 'str' | 'Image':
+            case 'str' | 'Image' | 'Url':
                 return "''"
             case 'bool':
                 return 'null'
@@ -206,7 +206,7 @@ class ModelRegister:
                 return 'i64'
             case 'float':
                 return 'f64'
-            case 'str' | "Image":
+            case 'str' | 'Image' | 'Url':
                 return 'String'
             case 'bool':
                 return 'bool'

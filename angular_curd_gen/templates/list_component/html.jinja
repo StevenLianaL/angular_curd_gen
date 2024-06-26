@@ -70,6 +70,8 @@
                     [nzSrc]="data.{{ ldf }}"
                     alt=""/>
                 </td>
+                {%- elif cls.extract_py_type(ldf_type)=='Url' -%}
+                <td><a [href]="data.{{ ldf }}">{{ left }}data.{{ ldf }}{{ right }}</a></td>
                 {%- else -%}
                     <td>{{ left }}data.{{ ldf }}{{ right }}</td>
                 {%- endif %}

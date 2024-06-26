@@ -16,4 +16,8 @@ class ModelAdmin:
 
 
 class Image(BaseModel):
-    src: str = ''
+    pass
+
+
+class Url(BaseModel):
+    pass

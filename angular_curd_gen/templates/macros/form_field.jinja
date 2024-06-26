@@ -3,7 +3,7 @@
     <nz-form-item>
         <nz-form-control>
             <nz-form-label>{{ label_name }}</nz-form-label>
-            {% if field_py_type=='str' -%}
+            {% if field_py_type in ['str','Url'] -%}
                 <nz-input-group>
                     <input nz-input placeholder="{{ placeholder }}" formControlName="{{ field_name }}"/>
                 </nz-input-group>
