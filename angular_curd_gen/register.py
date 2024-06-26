@@ -29,6 +29,8 @@ class ModelRegister:
     db_list = []
     db_field_count = {}
     db_field_values = {}
+    db_first_id = 0
+    db_last_id = 0
 
     # extract model info
     model_name = ''  # is single
@@ -81,9 +83,11 @@ class ModelRegister:
         self.out_rust_dir = self.out_app_dir / BACKEND_TEMPLATE_DIR
         self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR / self.app_name
         self.out_rust_src_dir = self.out_rust_dir / 'src'
+        self.our_rust_tests_dir = self.out_rust_dir / 'tests'
 
         self.output_angular_dir.mkdir(parents=True, exist_ok=True)
         self.out_rust_src_dir.mkdir(parents=True, exist_ok=True)
+        self.our_rust_tests_dir.mkdir(parents=True, exist_ok=True)
         (self.output_angular_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
 
         self._prepare_data()
@@ -102,6 +106,8 @@ class ModelRegister:
         # data
         cursor.execute(f"select * from {self.lower_models_name};")
         self.db_list = cursor.fetchall()
+        self.db_first_id = self.db_list[0]['id']
+        self.db_last_id = self.db_list[-1]['id']
 
         # field count
         sql = ("select " +
@@ -166,6 +172,7 @@ class ModelRegister:
         type_str = parse("<class '{type}'>", str(t))
         if not type_str:  # option
             type_str = parse("typing.Optional[{type}]", str(t))
+        print(f"{t=} {type_str=}")
         the_type = type_str.named['type']
         if '.' in the_type:
             the_type = the_type.split('.')[-1]
@@ -238,6 +245,8 @@ class ModelRegister:
             'db_pswd': self.db_pswd,
             'db_field_count': self.db_field_count,
             'db_field_values': self.db_field_values,
+            'db_first_id': self.db_first_id,
+            'db_last_id': self.db_last_id,
         }
         model_admin_context = {}
         for k in self.model_admin_fields:
@@ -263,7 +272,7 @@ class ModelRegister:
     def _to_test_folder(self):
         """Copy all files to test folder"""
         shutil.copytree(str(self.output_angular_dir), "W:/projects/work/ForCodeGen/src/app/game", dirs_exist_ok=True)
-        shutil.copytree(str(self.out_rust_dir / 'src'), "W:/rustProjects/web-base/src", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/web-base", dirs_exist_ok=True)
 
 
 @dataclass
@@ -343,6 +352,16 @@ class RustModelRegister(ModelRegister):
                         self._draw_template(
                             template_name=f"{BACKEND_TEMPLATE_DIR}/src/{folder.name}/{file.name}",
                             target=target, project=BACKEND_TEMPLATE_DIR)
+
+    def gen_t_rust_tests(self):
+        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'tests'
+        for file in template_dir.iterdir():
+            if file.is_file() and file.name.endswith('.jinja'):
+                template_name = file.name.removesuffix('.jinja')
+                target = f"tests/{template_name}".replace('model', self.lower_model_name)
+                self._draw_template(
+                    template_name=f"{BACKEND_TEMPLATE_DIR}/tests/{file.name}",
+                    target=target, project=BACKEND_TEMPLATE_DIR)
 
 
 def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin,

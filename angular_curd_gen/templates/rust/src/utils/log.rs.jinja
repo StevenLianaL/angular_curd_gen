@@ -58,7 +58,8 @@ macro_rules! file_name {
 #[macro_export]
 macro_rules! log_with_level {
     ($log:expr, $user:expr, $state:expr,$level:expr) => {{ left }}
-        use crate::{func_name, file_name,SETTINGS};
+        use crate::{func_name, file_name};
+        use crate::config::SETTINGS;
         use crate::utils::log::MongoLogger;
         let func_name = func_name!();
         let file_name = file_name!();

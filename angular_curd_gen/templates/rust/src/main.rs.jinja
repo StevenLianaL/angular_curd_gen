@@ -1,52 +1,6 @@
-mod config;
-pub mod utils;
-pub mod entities;
-pub mod routers;
-pub mod modules;
-
-use std::net::SocketAddr;
-use std::sync::Arc;
-use axum::{routing::get, Router, middleware};
-use mongodb::Client as MongoClient;
-use redis::Client as RedisClient;
-use sea_orm::{Database};
-use tower_http::cors::{Any, CorsLayer};
-use tokio::sync::Mutex as TokioMutex;
-
-use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL, SETTINGS};
-use crate::utils::state;
-
+use {{ app_name }}::{run_app};
 
 #[tokio::main]
 async fn main() {
-    let conn = Database::connect(DATABASE_URL.as_str())
-        .await
-        .expect("Database connection failed");
-    let redis_client = RedisClient::open(REDIS_URL.as_str()).expect("Invalid Redis URL");
-    let redis_connection = redis_client.get_multiplexed_async_connection().await.unwrap();
-
-
-    let mongo_client = MongoClient::with_uri_str(MONGO_URL.as_str()).await.expect("failed to connect");
-
-    let state = state::AppState {
-        conn: Arc::new(TokioMutex::new(conn)),
-        redis: Arc::new(TokioMutex::new(redis_connection)),
-        mongo: Arc::new(TokioMutex::new(mongo_client)),
-    };
-    let {{ lower_model_name }}_routers_with_state = routers::{{ lower_model_name }}::{{ lower_model_name }}_routes().with_state(state.clone());
-    let demo_routers_with_state = routers::demo::demo_routes().with_state(state.clone());
-    let app = Router::new()
-        .route("/", get(|| async { "Hello, W!" }))
-        .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
-        .nest("/demo", demo_routers_with_state)
-        .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))
-        .layer(CorsLayer::new()
-            .allow_origin(Any)
-            .allow_methods(Any)
-            .allow_headers(Any)
-            .allow_credentials(false))
-        .with_state(state);
-    let addr = SocketAddr::from(([0, 0, 0, 0], SETTINGS.port));
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    run_app().await;
 }
