@@ -1,6 +1,5 @@
 {% macro gen_rust_module(app_name) -%}
 use lazy_static::lazy_static;
-use crate::config::SETTINGS;
 use crate::utils;
 
 lazy_static! {
@@ -8,10 +7,6 @@ lazy_static! {
         utils::settings::ModuleSettings {
             name: "{{ app_name }}".to_string(),
         }
-    };
-
-    pub static ref MODULE_LOGGER: utils::log::MongoLogger = {
-        utils::log::MongoLogger::new(SETTINGS.project.as_str(),MODULE_SETTINGS.name.as_str())
     };
 }
 {% endmacro %}

@@ -7,8 +7,7 @@ use axum::routing::{get};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use sea_orm::ActiveValue::Set;
 use crate::entities::{{ single_left }}{{ model_name }}, {{ lower_model_name }}};
-use crate::func_name;
-use crate::modules::{{ lower_model_name }}::MODULE_LOGGER;
+use crate::info;
 use crate::utils::state;
 
 pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
@@ -18,7 +17,7 @@ pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
 }
 
 async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter): Query<{{ lower_model_name }}::{{ model_name }}Filter>) -> Response {
-    MODULE_LOGGER.info(&format!("filter: {filter:?}"), 0, state.clone(), func_name!()).await;
+    info!(&format!("filter: {filter:?}"), 0, state.clone());
 
     let conn = state.conn.lock().await;
     let mut query = {{ model_name }}::find();
@@ -38,7 +37,7 @@ async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter
 }
 
 async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> Response {
-    MODULE_LOGGER.info(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone(), func_name!()).await;
+    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
 
     let conn = state.conn.lock().await;
     let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();
@@ -46,7 +45,7 @@ async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower
 }
 
 async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Creatable>) -> Response {
-    MODULE_LOGGER.info(&format!("payload: {payload:?}"), 0, state.clone(), func_name!()).await;
+    info!(&format!("payload: {payload:?}"), 0, state.clone());
 
     let conn = state.conn.lock().await;
     let new_{{ lower_model_name }} = {{ lower_model_name }}::ActiveModel {
@@ -60,7 +59,7 @@ async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(paylo
 }
 
 async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<{{ lower_model_name }}::{{ model_name }}Editable>) -> impl IntoResponse {
-    MODULE_LOGGER.info(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}, payload: {payload:?}"), 0, state.clone(), func_name!()).await;
+    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}, payload: {payload:?}"), 0, state.clone());
 
     let conn = state.conn.lock().await;
     let raw_{{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();
@@ -74,7 +73,7 @@ async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lo
 
 
 async fn delete_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
-    MODULE_LOGGER.info(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone(), func_name!()).await;
+    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
 
     let conn = state.conn.lock().await;
     let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();

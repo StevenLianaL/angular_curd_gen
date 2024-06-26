@@ -1,20 +1,10 @@
-{% set left = "{{" -%}
+{% set left = '{{' -%}
 use axum::extract::State;
 use crate::config::SETTINGS;
 use crate::{entities};
 use crate::utils::state;
 
-#[macro_export]
-macro_rules! func_name {
-    () => {{ left }}
-        fn f() {}
-        fn type_name_of<T>(_: T) -> &'static str {
-            std::any::type_name::<T>()
-        }
-        let arr :Vec<&str>= type_name_of(f).split("::").collect();
-        arr[arr.len() - 3]
-    }};
-}
+
 pub struct MongoLogger {
     pub project: String,
     pub app: String,
@@ -43,20 +33,70 @@ impl MongoLogger {
         };
         collection.insert_one(payload, None).await.unwrap();
     }
+}
 
-    pub async fn info(&self, log: &str, user: i64, state: State<state::AppState>, func: &str) {
-        self.log(log, user, state, func, "info").await
-    }
+#[macro_export]
+macro_rules! func_name {
+    () => {{ left }}
+        fn f() {}
+        fn type_name_of<T>(_: T) -> &'static str {
+            std::any::type_name::<T>()
+        }
+        let arr :Vec<&str>= type_name_of(f).split("::").collect();
+        arr[arr.len() - 3]
+    }};
+}
+#[macro_export]
+macro_rules! file_name {
+    () => {{ left }}
+        use std::path::Path;
+        let file_name = Path::new(file!()).file_name().unwrap().to_str().unwrap();
+        let file_name_without_ext = file_name.strip_suffix(".rs").unwrap_or(file_name);
+        file_name_without_ext
+    }};
+}
+#[macro_export]
+macro_rules! log_with_level {
+    ($log:expr, $user:expr, $state:expr,$level:expr) => {{ left }}
+        use crate::{func_name, file_name,SETTINGS};
+        use crate::utils::log::MongoLogger;
+        let func_name = func_name!();
+        let file_name = file_name!();
+        let logger: MongoLogger = {
+            MongoLogger::new(SETTINGS.project.as_str(), file_name)
+        };
+        logger.log($log, $user, $state, func_name, $level).await;
+    }};
+}
 
-    pub async fn warning(&self, log: &str, user: i64, state: State<state::AppState>, func: &str) {
-        self.log(log, user, state, func, "warning").await
-    }
+#[macro_export]
+macro_rules! info {
+    ($log:expr, $user:expr, $state:expr) => {
+        use crate::log_with_level;
+        log_with_level!( $log, $user, $state, "info")
+    };
+}
 
-    pub async fn error(&self, log: &str, user: i64, state: State<state::AppState>, func: &str) {
-        self.log(log, user, state, func, "error").await
-    }
+#[macro_export]
+macro_rules! warning {
+    ($log:expr, $user:expr,  $state:expr) => {
+        use crate::log_with_level;
+        log_with_level!( $log, $user, $state, "warning")
+    };
+}
 
-    pub async fn debug(&self, log: &str, user: i64, state: State<state::AppState>, func: &str) {
-        self.log(log, user, state, func, "debug").await
-    }
+#[macro_export]
+macro_rules! error {
+    ($log:expr, $user:expr, $state:expr) => {
+        use crate::log_with_level;
+        log_with_level!( $log, $user, $state, "error")
+    };
+}
+
+#[macro_export]
+macro_rules! debug {
+    ($log:expr, $user:expr, $state:expr) => {
+        use crate::log_with_level;
+        log_with_level!( $log, $user, $state, "debug")
+    };
 }
