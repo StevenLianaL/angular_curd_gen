@@ -1,11 +1,18 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 use axum::{routing::get, Router, middleware};
+use listenfd::ListenFd;
 use mongodb::Client as MongoClient;
 use redis::Client as RedisClient;
 use sea_orm::{Database};
+use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
-use tokio::sync::Mutex as TokioMutex;
+use tokio::sync::{Mutex as TokioMutex, Notify};
+
+use tower_http::timeout::TimeoutLayer;
+#[cfg(unix)]
+use tokio::signal::unix::{signal, SignalKind};
+use tokio::task;
 
 pub mod entities;
 pub mod routers;
@@ -35,22 +42,62 @@ pub async fn create_app() -> Router {
     let {{ lower_model_name }}_routers_with_state = routers::{{ lower_model_name }}::{{ lower_model_name }}_routes().with_state(state.clone());
     let demo_routers_with_state = routers::demo::demo_routes().with_state(state.clone());
     let app = Router::new()
-        .route("/", get(|| async { "Hello, W!" }))
+        .route("/", get(|| async { "Hello, W1111!" }))
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
         .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))
-        .layer(CorsLayer::new()
-            .allow_origin(Any)
-            .allow_methods(Any)
-            .allow_headers(Any)
-            .allow_credentials(false))
-        .with_state(state);
+        .layer((
+            TimeoutLayer::new(std::time::Duration::from_secs(10)),
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any)
+                .allow_credentials(false)
+        )).with_state(state);
     app
 }
 
-pub async fn run_app() {
-    let app = create_app().await;
-    let addr = SocketAddr::from(([0, 0, 0, 0], config::SETTINGS.port));
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+pub async fn run_app(notify: Arc<Notify>) {
+    loop {
+        let mut listenfd = ListenFd::from_env();
+        let addr = SocketAddr::from(([0, 0, 0, 0], config::SETTINGS.port));
+
+        let app = create_app().await;
+        let listener = match listenfd.take_tcp_listener(0).unwrap() {
+            Some(listener) => {
+                listener.set_nonblocking(true).unwrap();
+                TcpListener::from_std(listener).unwrap()
+            }
+            None => TcpListener::bind(addr).await.unwrap(),
+        };
+        axum::serve(listener, app).await.unwrap();
+        tokio::select! {
+            _ = notify.notified() => {
+                break;
+            },
+        }
+    }
+}
+
+pub async fn reload_app() {
+    let notify = Arc::new(Notify::new());
+    let notify_clone = notify.clone();
+    task::spawn(async move {
+        run_app(notify_clone).await;
+    });
+
+    #[cfg(unix)]
+    {
+        let notify_clone = notify.clone();
+        task::spawn(async move {
+            let mut sighup = signal(SignalKind::hangup()).unwrap();
+            while let Some(_) = sighup.recv().await {
+                notify_clone.notify_waiters();
+            }
+        });
+    }
+
+    loop {
+        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+    }
 }

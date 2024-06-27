@@ -1,6 +1,6 @@
-use {{ app_name }}::{run_app};
+use game::{reload_app};
 
 #[tokio::main]
 async fn main() {
-    run_app().await;
+    reload_app().await;
 }
