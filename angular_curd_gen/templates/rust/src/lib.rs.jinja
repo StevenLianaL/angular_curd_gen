@@ -47,6 +47,7 @@ pub async fn create_app() -> Router {
         .nest("/auth", auth_routers_with_state)
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
+        // .route_layer(middleware::from_fn(utils::middlewares::jwt_auth))
         .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))
         .layer((
             TimeoutLayer::new(std::time::Duration::from_secs(10)),

@@ -5,8 +5,10 @@ use axum::{
 };
 use axum::extract::{MatchedPath, State};
 use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use crate::config::PROJECT;
 use crate::entities;
+use crate::utils::auth::{Claims, JwtManager};
 use crate::utils::state;
 
 pub async fn log_req_access_times(state: State<state::AppState>, req: Request, next: Next) -> Result<Response, StatusCode> {
@@ -17,4 +19,46 @@ pub async fn log_req_access_times(state: State<state::AppState>, req: Request, n
     access_log.increase(state).await;
     let res = next.run(req).await;
     Ok(res)
+}
+
+pub async fn jwt_auth(req: Request, next: Next) -> Result<Response, StatusCode> {
+    let jwt_header_name = "jwt"; // or can be Authorization
+
+    let not_validate_suffix = vec![
+        "docs", "openapi.json", "login", "register", "safe", "demo", "access",
+    ];
+    let req_method = req.method().to_string();
+
+    // options
+    if req_method == "OPTIONS" {
+        let res = next.run(req).await;
+        return Ok(res);
+    }
+
+    // suffix
+    let url = req.extensions().get::<MatchedPath>().unwrap().as_str().to_string();
+    if not_validate_suffix.iter().any(|&x| url.ends_with(x)) {
+        let res = next.run(req).await;
+        return Ok(res);
+    }
+
+    // jwt
+    let token = req.headers().get(jwt_header_name);
+    let token = match token {
+        Some(token) => token.to_str().unwrap().to_string(),
+        None => "".to_string(),
+    };
+    return if token.is_empty() {
+        let response = (StatusCode::UNAUTHORIZED, "without jwt").into_response();
+        Ok(response)
+    } else {
+        let payload: Claims = JwtManager::decode_token(token);
+        if payload.exp < chrono::Utc::now().timestamp() {
+            let response = (StatusCode::UNAUTHORIZED, "jwt timeout").into_response();
+            Ok(response)
+        } else {
+            let res = next.run(req).await;
+            Ok(res)
+        }
+    };
 }
