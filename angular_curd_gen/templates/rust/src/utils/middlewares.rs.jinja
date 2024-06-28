@@ -10,9 +10,9 @@ use crate::entities;
 use crate::utils::state;
 
 pub async fn log_req_access_times(state: State<state::AppState>, req: Request, next: Next) -> Result<Response, StatusCode> {
-    let func = format!("{} {}", req.method(), req.extensions().get::<MatchedPath>().unwrap().as_str());
+    let url = req.extensions().get::<MatchedPath>().unwrap().as_str().to_string();
     let access_log = entities::models::log::AccessLog::new(
-        PROJECT.to_string(), "app".to_string(), func,
+        PROJECT.to_string(), "app".to_string(), url, req.method().to_string(),
     );
     access_log.increase(state).await;
     let res = next.run(req).await;

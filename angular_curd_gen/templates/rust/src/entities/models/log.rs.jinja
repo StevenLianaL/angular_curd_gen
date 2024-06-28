@@ -21,20 +21,22 @@ pub struct NewLogRecord {
 pub struct AccessLog {
     pub project: String,
     pub app: String,
-    pub func: String, // method and uri name, because function name cannot get from request
+    pub url: String, // method and uri name, because function name cannot get from request
+    pub method: String,
     count: i64,
     month: String,
 }
 
 
 impl AccessLog {
-    pub fn new(project: String, app: String, func: String) -> Self {
+    pub fn new(project: String, app: String, url: String, method: String) -> Self {
         let month = chrono::Utc::now().format("%Y-%m").to_string();
 
         Self {
             project,
             app,
-            func,
+            url,
+            method,
             count: 1,
             month,
         }
@@ -42,12 +44,13 @@ impl AccessLog {
     pub async fn increase(&self, state: State<state::AppState>) {
         let mongo = state.mongo.lock().await;
         let db = mongo.database(SETTINGS.mongo.name.as_str());
-        let collection: Collection<AccessLog> = db.collection("log_access");
+        let collection: Collection<AccessLog> = db.collection("log_access_r");
         let filter = doc! {
             "project": &self.project,
             "app": &self.app,
-            "func": &self.func,
+            "url": &self.url,
             "month": &self.month,
+            "method": &self.method,
         };
 
         let update = doc! {
