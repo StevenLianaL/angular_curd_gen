@@ -22,7 +22,7 @@ impl MongoLogger {
         let mongo = state.mongo.lock().await;
         let db = mongo.database(SETTINGS.mongo.name.as_str());
         let collection = db.collection("log_record");
-        let payload = entities::log::NewLogRecord {
+        let payload = entities::models::log::NewLogRecord {
             app: self.app.clone(),
             func: func.to_string(),
             log: log.to_string(),

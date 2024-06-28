@@ -4,7 +4,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use redis::AsyncCommands;
 use axum::http::StatusCode;
-use crate::entities::demo::{RedisKey, RedisKeyValue};
+use crate::entities::models::demo::{RedisKey, RedisKeyValue};
 use crate::info;
 use crate::utils::state;
 

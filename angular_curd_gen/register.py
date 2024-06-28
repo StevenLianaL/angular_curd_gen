@@ -81,16 +81,25 @@ class ModelRegister:
         self.out_app_dir = Path(f"{self.app_name}")
 
         self.out_rust_dir = self.out_app_dir / BACKEND_TEMPLATE_DIR
-        self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR / self.app_name
         self.out_rust_src_dir = self.out_rust_dir / 'src'
         self.our_rust_tests_dir = self.out_rust_dir / 'tests'
+        self.out_rust_src_entities_dir = self.out_rust_src_dir / "entities"
+        self.out_rust_src_entity_models_dir = self.out_rust_src_entities_dir / "models"
+        self.out_rust_src_entity_tables_dir = self.out_rust_src_entities_dir / "tables"
 
-        self.output_angular_dir.mkdir(parents=True, exist_ok=True)
-        self.out_rust_src_dir.mkdir(parents=True, exist_ok=True)
-        self.our_rust_tests_dir.mkdir(parents=True, exist_ok=True)
-        (self.output_angular_dir / self.lower_model_name).mkdir(parents=True, exist_ok=True)
+        self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR / self.app_name
+        self.output_angular_lower_model_name_dir = self.output_angular_dir / self.lower_model_name
+
+        self._prepare_dirs()
 
         self._prepare_data()
+
+    def _prepare_dirs(self):
+        for attr in dir(self):
+            if attr.endswith('_dir'):
+                attr_value: Path = getattr(self, attr)
+                if not attr_value.exists():
+                    attr_value.mkdir(parents=True, exist_ok=True)
 
     def _prepare_data(self):
         """Query model data, to count frontend component."""
@@ -172,7 +181,6 @@ class ModelRegister:
         type_str = parse("<class '{type}'>", str(t))
         if not type_str:  # option
             type_str = parse("typing.Optional[{type}]", str(t))
-        print(f"{t=} {type_str=}")
         the_type = type_str.named['type']
         if '.' in the_type:
             the_type = the_type.split('.')[-1]
@@ -191,7 +199,6 @@ class ModelRegister:
             case 'datetime' | 'date':
                 return 'Date'
             case _:
-                print(the_type, 't')
                 raise ValueError(f"not support type {t}")
 
     def map_ts_type_default(self, t):
@@ -320,7 +327,7 @@ class RustModelRegister(ModelRegister):
     """"""
 
     def gen_f_rust_project_files(self):
-        """Generate rust project with rust"""
+        """Generate rust project root files"""
         rust_template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR
         for file in rust_template_dir.iterdir():
             if file.is_file() and file.name.endswith('.jinja'):
@@ -330,6 +337,7 @@ class RustModelRegister(ModelRegister):
                     target=template_name, project=BACKEND_TEMPLATE_DIR)
 
     def gen_g_rust_scripts(self):
+        """Generate rust scripts in src"""
         template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
         for file in template_dir.iterdir():
             if file.is_file() and file.name.endswith('.jinja'):
@@ -339,18 +347,30 @@ class RustModelRegister(ModelRegister):
                     target=f"src/{template_name}", project=BACKEND_TEMPLATE_DIR)
 
     def gen_h_rust_sub_modules(self):
-        """Generate rust sub modules"""
+        """Generate rust src sub modules"""
         template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
 
         for folder in template_dir.iterdir():
             if folder.is_dir():
                 (self.out_rust_src_dir / folder.name).mkdir(parents=True, exist_ok=True)
-                for file in folder.iterdir():
-                    if file.is_file() and file.name.endswith('.jinja'):
-                        template_name = file.name.removesuffix('.jinja')
+                for first_level_file in folder.iterdir():
+                    if first_level_file.is_dir():
+                        for second_level_file in first_level_file.iterdir():
+                            template_name = second_level_file.name.removesuffix('.jinja')
+                            file_path = f"{folder.name}/{first_level_file.name}"
+                            target = f"src/{file_path}/{template_name}".replace(
+                                'model.rs', f"{self.lower_model_name}.rs"
+                            )
+                            self._draw_template(
+                                template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file_path}/{second_level_file.name}",
+                                target=target, project=BACKEND_TEMPLATE_DIR
+                            )
+
+                    if first_level_file.is_file() and first_level_file.name.endswith('.jinja'):
+                        template_name = first_level_file.name.removesuffix('.jinja')
                         target = f"src/{folder.name}/{template_name}".replace('model', self.lower_model_name)
                         self._draw_template(
-                            template_name=f"{BACKEND_TEMPLATE_DIR}/src/{folder.name}/{file.name}",
+                            template_name=f"{BACKEND_TEMPLATE_DIR}/src/{folder.name}/{first_level_file.name}",
                             target=target, project=BACKEND_TEMPLATE_DIR)
 
     def gen_t_rust_tests(self):
