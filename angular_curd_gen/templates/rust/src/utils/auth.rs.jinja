@@ -1,0 +1,101 @@
+use bcrypt::{hash, verify, DEFAULT_COST};
+use chrono::Utc;
+use jsonwebtoken::{decode, DecodingKey, encode, EncodingKey, Header, Validation};
+use serde::{Deserialize, Serialize};
+use crate::config::SETTINGS;
+
+pub struct PasswordManager {
+    pub prefix: String,
+}
+
+impl PasswordManager {
+    pub fn new(prefix: String) -> PasswordManager {
+        PasswordManager {
+            prefix,
+        }
+    }
+
+    pub fn generate_password(&self, raw: &str) -> String {
+        let hashed = hash(raw, DEFAULT_COST).expect("Failed to hash password");
+        format!("{}{}", self.prefix, hashed)
+    }
+
+    pub fn verify_password(&self, raw_password: &str, db_password: &str) -> bool {
+        let password = db_password.strip_prefix(&self.prefix).unwrap_or(db_password);
+        verify(raw_password, password).unwrap_or(false)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Claims {
+    // aud: String,         // Optional. Audience
+    exp: i64,          // Required (validate_exp defaults to true in validation). Expiration time (as UTC timestamp)
+    iat: i64,          // Optional. Issued at (as UTC timestamp)
+    iss: String,         // Optional. Issuer
+    user_id: i64,       // Optional. Subject (whom token refers to)
+    // nbf: usize,          // Optional. Not Before (as UTC timestamp)
+    // sub: String,         // Optional. Subject (whom token refers to)
+}
+
+pub struct JwtManager {}
+
+impl JwtManager {
+    pub fn gen_token(user_id: i64) -> String {
+        let now = Utc::now();
+        let now_stamp = now.timestamp();
+        let exp_stamp = (now + chrono::Duration::hours(SETTINGS.jwt_expire)).timestamp();
+        let my_claims = Claims {
+            exp: exp_stamp,
+            iat: now_stamp,
+            iss: SETTINGS.jwt_iss.clone(),
+            user_id,
+        };
+        let token = encode(
+            &Header::default(),
+            &my_claims, &EncodingKey::from_secret(SETTINGS.jwt_secret.as_ref())).unwrap();
+        token
+    }
+
+    pub fn decode_token(token: String) -> Claims {
+        let claims = decode::<Claims>(
+            &token,
+            &DecodingKey::from_secret(SETTINGS.jwt_secret.as_ref()),
+            &Validation::default()).unwrap();
+        claims.claims
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_password() {
+        let password_manager = PasswordManager::new("".to_string());
+        let raw_password = "password";
+        let hashed_password = password_manager.generate_password(raw_password);
+        assert_ne!(raw_password, hashed_password);
+    }
+
+    #[test]
+    fn test_verify_password() {
+        let password_manager = PasswordManager::new("".to_string());
+        let raw_password = "password";
+        let hashed_password = password_manager.generate_password(raw_password);
+        assert!(password_manager.verify_password(raw_password, &hashed_password));
+    }
+
+    #[test]
+    fn test_gen_token() {
+        let token = JwtManager::gen_token(1);
+        assert_ne!(token, "".to_string());
+    }
+
+    #[test]
+    fn test_decode_token() {
+        let user_id = 1;
+        let token = JwtManager::gen_token(user_id);
+        let claims = JwtManager::decode_token(token);
+        assert_eq!(claims.user_id, user_id);
+    }
+}

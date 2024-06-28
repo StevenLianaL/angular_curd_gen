@@ -1,0 +1,52 @@
+use axum::extract::State;
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
+use axum::{Json, Router};
+use axum::routing::{post};
+use sea_orm::{EntityTrait, ColumnTrait, QueryFilter};
+use serde_json::json;
+use crate::entities::models::auth::LoginRequest;
+use crate::entities::tables::{user, User};
+use crate::{error, info};
+use crate::entities::models;
+use crate::modules::auth::PASSWORD_MANAGER;
+use crate::utils::auth::JwtManager;
+use crate::utils::state;
+
+pub fn auth_routes() -> Router<state::AppState> {
+    Router::new()
+        .route("/login", post(login))
+}
+
+async fn login(state: State<state::AppState>, Json(payload): Json<LoginRequest>) -> Response {
+    info!(&format!("payload.username: {}",payload.username), 0, state.clone());
+
+    // user
+    let conn = state.conn.lock().await;
+    let condition = user::Column::Username.eq(&payload.username);
+    let user_result = User::find().filter(condition).one(&*conn).await.unwrap();
+    let user = match user_result {
+        Some(user) => user,
+        None => {
+            let err_msg = format!("User {} not found", &payload.username);
+            error!(&err_msg, 0, state.clone());
+            return (StatusCode::BAD_REQUEST, Json(json!({ "detail": err_msg }))).into_response();
+        }
+    };
+
+    // password
+    if !PASSWORD_MANAGER.verify_password(&payload.password, &user.password) {
+        error!(&format!("Password {} not match",&payload.password), 0, state.clone());
+        return (StatusCode::BAD_REQUEST, Json(json!({ "detail": "密码错误" }))).into_response();
+    }
+
+    // jwt
+    let res = models::auth::LoginResponse {
+        id: user.id,
+        username: user.username,
+        jwt: JwtManager::gen_token(user.id),
+    };
+
+
+    (StatusCode::OK, Json(res)).into_response()
+}

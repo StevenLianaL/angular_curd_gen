@@ -39,10 +39,12 @@ pub async fn create_app() -> Router {
         redis: Arc::new(TokioMutex::new(redis_connection)),
         mongo: Arc::new(TokioMutex::new(mongo_client)),
     };
+    let auth_routers_with_state = routers::auth::auth_routes().with_state(state.clone());
     let {{ lower_model_name }}_routers_with_state = routers::{{ lower_model_name }}::{{ lower_model_name }}_routes().with_state(state.clone());
     let demo_routers_with_state = routers::demo::demo_routes().with_state(state.clone());
     let app = Router::new()
         .route("/", get(|| async { "Hello, W1111!" }))
+        .nest("/auth", auth_routers_with_state)
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
         .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))

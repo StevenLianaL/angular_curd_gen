@@ -9,6 +9,10 @@ pub struct Settings {
     pub db: utils::db::DatabaseSettings,
     pub mongo: utils::db::DatabaseSettings,
     pub redis: utils::db::RedisSettings,
+
+    pub jwt_iss: String,
+    pub jwt_secret: String,
+    pub jwt_expire: i64,
 }
 
 #[derive(Debug, Deserialize)]
