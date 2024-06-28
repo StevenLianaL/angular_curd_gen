@@ -32,7 +32,7 @@ pub struct Claims {
     pub exp: i64,          // Required (validate_exp defaults to true in validation). Expiration time (as UTC timestamp)
     iat: i64,          // Optional. Issued at (as UTC timestamp)
     iss: String,         // Optional. Issuer
-    pub user_id: i64,     // Optional. Subject (whom token refers to)
+    pub user_id: i64,  // Optional. Subject (whom token refers to)
     // nbf: usize,          // Optional. Not Before (as UTC timestamp)
     // sub: String,         // Optional. Subject (whom token refers to)
 }

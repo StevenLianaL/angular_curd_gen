@@ -21,7 +21,7 @@ pub async fn log_req_access_times(state: State<state::AppState>, req: Request, n
     Ok(res)
 }
 
-pub async fn jwt_auth(req: Request, next: Next) -> Result<Response, StatusCode> {
+pub async fn jwt_auth(mut req: Request, next: Next) -> Result<Response, StatusCode> {
     let jwt_header_name = "jwt"; // or can be Authorization
 
     let not_validate_suffix = vec![
@@ -57,6 +57,7 @@ pub async fn jwt_auth(req: Request, next: Next) -> Result<Response, StatusCode> 
             let response = (StatusCode::UNAUTHORIZED, "jwt timeout").into_response();
             Ok(response)
         } else {
+            req.extensions_mut().insert(payload.user_id.clone());
             let res = next.run(req).await;
             Ok(res)
         }
