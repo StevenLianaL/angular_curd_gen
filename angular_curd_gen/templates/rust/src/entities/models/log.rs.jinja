@@ -1,7 +1,6 @@
 use axum::extract::State;
 use bson::{DateTime, doc};
 use mongodb::Collection;
-use mongodb::options::{FindOneAndUpdateOptions, ReturnDocument};
 use serde::{Deserialize, Serialize};
 use crate::config::SETTINGS;
 use crate::utils::state;
@@ -57,11 +56,6 @@ impl AccessLog {
             "$inc": { "count": 1 },
         };
 
-        let options = FindOneAndUpdateOptions::builder()
-            .return_document(Some(ReturnDocument::After))
-            .upsert(true)
-            .build();
-
-        collection.find_one_and_update(filter, update, options).await.unwrap();
+        collection.find_one_and_update(filter, update).upsert(true).await.unwrap();
     }
 }

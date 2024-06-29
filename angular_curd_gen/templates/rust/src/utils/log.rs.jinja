@@ -31,7 +31,7 @@ impl MongoLogger {
             level: level.to_string(),
             created: bson::DateTime::now(),
         };
-        collection.insert_one(payload, None).await.unwrap();
+        collection.insert_one(payload).await.unwrap();
     }
 }
 
