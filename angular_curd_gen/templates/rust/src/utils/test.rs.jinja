@@ -1,0 +1,41 @@
+use axum::{
+    body::Body,
+    http::Request,
+    response::Response,
+};
+use tower::ServiceExt;
+use crate::create_app;
+
+pub async fn post_response(url: &str, req_body: String, token: String) -> Response<Body> {
+    send_request("POST", url, req_body, token).await
+}
+
+pub async fn put_response(url: &str, req_body: String, token: String) -> Response<Body> {
+    send_request("PUT", url, req_body, token).await
+}
+
+pub async fn get_response(url: &str, req_body: String, token: String) -> Response<Body> {
+    send_request("GET", url, req_body, token).await
+}
+
+pub async fn delete_response(url: &str, req_body: String, token: String) -> Response<Body> {
+    send_request("DELETE", url, req_body, token).await
+}
+
+async fn send_request(method: &str, url: &str, req_body: String, token: String) -> Response<Body> {
+    let app = create_app().await;
+    let mut request_builder = Request::builder()
+        .method(method)
+        .uri(url)
+        .header("content-type", "application/json");
+
+    if !token.is_empty() {
+        request_builder = request_builder.header("jwt", token);
+    }
+
+    let request = request_builder
+        .body(Body::from(req_body))
+        .unwrap();
+
+    app.oneshot(request).await.unwrap()
+}

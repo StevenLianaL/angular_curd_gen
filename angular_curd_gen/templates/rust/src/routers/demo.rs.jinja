@@ -11,9 +11,9 @@ use crate::utils::state;
 
 pub fn demo_routes() -> Router<state::AppState> {
     Router::new()
-        .route("/redis", get(get_by_redis).post(set_redis_key))
-        .route("/mongo", post(set_mongo_record))
-        .route("/jwt", get(get_jwt_user_id))
+        .route("/redis/demo", get(get_by_redis).post(set_redis_key))
+        .route("/mongo/demo", post(set_mongo_record))
+        .route("/jwt/demo", get(get_jwt_user_id))
 }
 
 async fn get_by_redis(state: State<state::AppState>, Query(params): Query<RedisKey>) -> Response {

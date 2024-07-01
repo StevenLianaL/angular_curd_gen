@@ -1,83 +1,30 @@
 use axum::{
-    body::Body,
-    http::{Request, StatusCode},
+    http::StatusCode,
 };
-use {{ app_name }}::create_app;
-use tower::util::ServiceExt;
+use {{ app_name }}::utils::test::{get_response, post_response};
 
 #[tokio::test]
 async fn test_get_by_redis() {
-    let app = create_app().await;
-
-    // 200 exist key OK
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("GET")
-                .uri("/demo/redis?key=test")
-                .header("content-type", "application/json")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let response = get_response("/demo/redis/demo?key=test", "".to_string(), "".to_string()).await;
     assert_eq!(response.status(), StatusCode::OK);
 
-    // 400 not exist key
-    let app = create_app().await;
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("GET")
-                .uri("/demo/redis?key=not_exist_key")
-                .header("content-type", "application/json")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let response = get_response("/demo/redis/demo?key=not_exist_key", "".to_string(), "".to_string()).await;
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
 
 #[tokio::test]
 async fn test_set_redis_key() {
-    let app = create_app().await;
     let json = serde_json::json!({
         "key": format!("test_{}", chrono::Local::now().timestamp()),
         "value": "test"
     });
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("POST")
-                .uri("/demo/redis")
-                .header("content-type", "application/json")
-                .body(Body::from(json.to_string()))
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let response = post_response("/demo/redis/demo", json.to_string(), "".to_string()).await;
     assert_eq!(response.status(), StatusCode::CREATED);
 }
 
 #[tokio::test]
-async fn set_mongo_record() {
-    let app = create_app().await;
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("POST")
-                .uri("/demo/mongo")
-                .header("content-type", "application/json")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+async fn test_set_mongo_record() {
+    let response = post_response("/demo/mongo/demo", "".to_string(), "".to_string()).await;
     assert_eq!(response.status(), StatusCode::CREATED);
 }

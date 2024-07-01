@@ -279,7 +279,7 @@ class ModelRegister:
     def _to_test_folder(self):
         """Copy all files to test folder"""
         shutil.copytree(str(self.output_angular_dir), "W:/projects/work/ForCodeGen/src/app/game", dirs_exist_ok=True)
-        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/web-base", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/health_videos", dirs_exist_ok=True)
 
 
 @dataclass

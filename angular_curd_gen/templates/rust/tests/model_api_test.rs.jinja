@@ -1,28 +1,15 @@
 use axum::{
-    body::Body,
-    http::{Request, StatusCode},
+    http::StatusCode,
 };
-use {{ app_name }}::create_app;
-use tower::util::ServiceExt;
 use http_body_util::BodyExt;
+use {{ app_name }}::utils::auth::JwtManager;
+use {{ app_name }}::utils::test::{delete_response, get_response, post_response, put_response};
+
 
 #[tokio::test]
 async fn test_get_{{ lower_models_name }}() {
-    let app = create_app().await;
-
-    // 200 list
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("GET")
-                .uri("/{{ app_name }}/{{ lower_models_name }}")
-                .header("content-type", "application/json")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let token = JwtManager::gen_token(1);
+    let response = get_response("/{{ app_name }}/{{ lower_models_name }}", "".to_string(), token).await;
     assert_eq!(response.status(), StatusCode::OK);
     let body = response.into_body().collect().await.unwrap().to_bytes();
     assert!(!body.is_empty());
@@ -31,7 +18,7 @@ async fn test_get_{{ lower_models_name }}() {
 
 #[tokio::test]
 async fn test_create_{{ lower_model_name }}() {
-    let app = create_app().await;
+    let token = JwtManager::gen_token(1);
     let json = serde_json::json!(
         {
             {% for form_field,type in model_create_fields_type_map.items() -%}
@@ -46,43 +33,20 @@ async fn test_create_{{ lower_model_name }}() {
     {%- endfor -%}
     }
     );
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("POST")
-                .uri("/{{ app_name }}/{{ lower_models_name }}")
-                .header("content-type", "application/json")
-                .body(Body::from(json.to_string()))
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let response = post_response("/{{ app_name }}/{{ lower_models_name }}", json.to_string(), token.clone()).await;
     assert_eq!(response.status(), StatusCode::CREATED);
 }
 
 #[tokio::test]
 async fn test_get_{{ lower_model_name }}() {
-    let app = create_app().await;
-
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("GET")
-                .uri("/{{ app_name }}/{{ lower_models_name }}/{{ db_first_id }}")
-                .header("content-type", "application/json")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let token = JwtManager::gen_token(1);
+    let response = get_response("/{{ app_name }}/{{ lower_models_name }}/{{ db_first_id }}", "".to_string(), token).await;
     assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
 async fn test_update_{{ lower_model_name }}() {
-    let app = create_app().await;
+    let token = JwtManager::gen_token(1);
     let json = serde_json::json!(
         {
             {% for form_field,type in model_edit_fields_type_map.items() -%}
@@ -97,36 +61,13 @@ async fn test_update_{{ lower_model_name }}() {
     {%- endfor -%}
     }
     );
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("PUT")
-                .uri("/{{ app_name }}/{{ lower_models_name }}/{{ db_first_id }}")
-                .header("content-type", "application/json")
-                .body(Body::from(json.to_string()))
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let response = put_response("/{{ app_name }}/{{ lower_models_name }}/{{ db_first_id }}", json.to_string(), token.clone()).await;
     assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
 async fn test_delete_{{ lower_model_name }}() {
-    let app = create_app().await;
-
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method("DELETE")
-                .uri("/{{ app_name }}/{{ lower_models_name }}/{{ db_last_id }}")
-                .header("content-type", "application/json")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
+    let token = JwtManager::gen_token(1);
+    let response = delete_response("/{{ app_name }}/{{ lower_models_name }}/{{ db_last_id }}", "".to_string(), token).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }

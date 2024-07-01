@@ -1,39 +1,20 @@
 use axum::{
-    body::Body,
-    http::{Request, StatusCode},
+    http::StatusCode,
 };
-use axum::response::Response;
-use {{ app_name }}::create_app;
-use tower::util::ServiceExt;
 use http_body_util::BodyExt;
 use serde_json::{json, Value};
+use {{ app_name }}::utils::test::post_response;
 
-async fn post_response(method: &str, url: &str, req_body: String) -> Response {
-    let app = create_app().await;
-
-    let response = app
-        .oneshot(
-            Request::builder()
-                .method(method)
-                .uri(url)
-                .header("content-type", "application/json")
-                .body(Body::from(req_body))
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-    response
-}
 
 #[tokio::test]
 async fn test_login() {
-    // 200
+    let token = "".to_string();
     let json = json!(
         {
             "username": "test",
             "password": "123",
         });
-    let response = post_response("POST", "/auth/login", json.to_string()).await;
+    let response = post_response("/auth/login", json.to_string(), token.clone()).await;
     assert_eq!(response.status(), StatusCode::OK);
 
     // user not found
@@ -43,7 +24,7 @@ async fn test_login() {
             "password": "1233",
         }
     );
-    let response = post_response("POST", "/auth/login", json.to_string()).await;
+    let response = post_response("/auth/login", json.to_string(), token.clone()).await;
     let body = response.into_body().collect().await.unwrap().to_bytes();
     let body: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(body, json!({ "detail": "User test1 not found" }));
@@ -56,7 +37,7 @@ async fn test_login() {
             "password": "1233",
         }
     );
-    let response = post_response("POST", "/auth/login", json.to_string()).await;
+    let response = post_response("/auth/login", json.to_string(), token.clone()).await;
     let body = response.into_body().collect().await.unwrap().to_bytes();
     let body: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(body, json!({ "detail": "密码错误" }));
