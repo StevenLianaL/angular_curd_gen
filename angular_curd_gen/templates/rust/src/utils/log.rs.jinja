@@ -73,8 +73,7 @@ macro_rules! log_with_level {
 #[macro_export]
 macro_rules! info {
     ($log:expr, $user:expr, $state:expr) => {
-        use crate::log_with_level;
-        log_with_level!( $log, $user, $state, "info")
+        crate::log_with_level!( $log, $user, $state, "info")
     };
 }
 
