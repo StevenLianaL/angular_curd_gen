@@ -77,7 +77,9 @@ async fn delete_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lo
     info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
 
     let conn = state.conn.lock().await;
-    let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap().unwrap();
-    {{ lower_model_name }}.delete(&*conn).await.unwrap();
+    let {{ lower_model_name }} = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*conn).await.unwrap();
+    if let Some({{ lower_model_name }}) = {{ lower_model_name }} {
+        {{ lower_model_name }}.delete(&*conn).await.unwrap();
+    };
     StatusCode::NO_CONTENT.into_response()
 }
