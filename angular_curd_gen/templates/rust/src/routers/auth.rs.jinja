@@ -22,9 +22,8 @@ async fn login(state: State<state::AppState>, Json(payload): Json<LoginRequest>)
     info!(&format!("payload.username: {}",payload.username), 0, state.clone());
 
     // user
-    let conn = state.conn.lock().await;
     let condition = user::Column::Username.eq(&payload.username);
-    let user_result = User::find().filter(condition).one(&*conn).await.unwrap();
+    let user_result = User::find().filter(condition).one(&*state.conn).await.unwrap();
     let user = match user_result {
         Some(user) => user,
         None => {

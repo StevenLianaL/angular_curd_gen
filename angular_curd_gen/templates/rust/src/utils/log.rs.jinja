@@ -19,8 +19,7 @@ impl MongoLogger {
     }
 
     pub async fn log(&self, log: &str, user: i64, state: State<state::AppState>, func: &str, level: &str) {
-        let mongo = state.mongo.lock().await;
-        let db = mongo.database(SETTINGS.mongo.name.as_str());
+        let db = state.mongo.database(SETTINGS.mongo.name.as_str());
         let collection = db.collection("log_record");
         let payload = entities::models::log::NewLogRecord {
             app: self.app.clone(),

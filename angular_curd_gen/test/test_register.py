@@ -77,9 +77,41 @@ class GameInfoAdmin:
     model_translate_fields = ('ID', '游戏链接', '游戏名称', '游戏封面', '浏览次数')
 
 
+class Video(BaseModel):
+    id: int
+    name: str
+    abstract: str = ""
+    word: str = ""
+    cloud_id: str = ""
+    tags: str = ""
+    category: str = ""
+    chapter: str = ""
+    grades: str = "[]"
+    integration: str = "[]"
+    field: str = "[]"
+    source: str = "public"
+
+
+class VideosAdmin:
+    """游戏信息管理注释文档信息"""
+    model_readable_name = '视频'
+    model_fields = ('id', 'name', 'abstract', 'word', 'cloud_id', 'tags', 'category',
+                    'chapter', 'grades', 'integration', 'field', 'source')
+    list_display_restraint = ('id', 'name', 'grades', 'chapter', 'abstract', 'field', 'integration')
+    list_editable_restraint = ()
+    list_filter_fields = ('name', 'grades', 'field', 'integration', 'integration')
+    list_sort_fields = ()
+    model_edit_fields = ('name', 'chapter', 'abstract', 'field')
+    model_create_fields = ('name', 'chapter', 'abstract', 'field', 'cloud_id')
+    model_translate_fields = ('ID', '名称', '摘要', '脚本', '云链接', '标签',
+                              '分类', '节', '年级', '学科覆盖', '领域', '来源')
+
+
 def test_register():
     # generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用',
     #                    db_name='yd_user', db_user='test', db_pswd='test')
-    generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
-                       db_name='game_search', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
+    #                    db_name='game_search', db_user='test', db_pswd='test')
     # generate_whole_app(model_admin=AppsAdmin, model=Apps, app_name='first', app_readable_name='纯应用')
+    generate_whole_app(model_admin=VideosAdmin, model=Video, app_name='video', app_readable_name='视频管理',
+                       db_name='health_videos', db_user='test', db_pswd='test')

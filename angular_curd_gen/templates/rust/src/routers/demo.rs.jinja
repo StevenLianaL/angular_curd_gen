@@ -19,7 +19,7 @@ pub fn demo_routes() -> Router<state::AppState> {
 async fn get_by_redis(state: State<state::AppState>, Query(params): Query<RedisKey>) -> Response {
     info!(&format!("params: {params:?}"), 0, state.clone());
 
-    let mut redis = state.redis.lock().await;
+    let mut redis =state.redis.get().await.unwrap();
     match redis.get::<_, Option<String>>(&params.key).await {
         Ok(Some(value)) => (StatusCode::OK, value).into_response(),
         Ok(None) => (
@@ -36,7 +36,7 @@ async fn get_by_redis(state: State<state::AppState>, Query(params): Query<RedisK
 async fn set_redis_key(state: State<state::AppState>, Json(payload): Json<RedisKeyValue>) -> Response {
     info!(&format!("payload: {payload:?}"), 0, state.clone());
 
-    let mut redis = state.redis.lock().await;
+    let mut redis =state.redis.get().await.unwrap();
     match redis.set::<_, _, ()>(&payload.key, &payload.value).await {
         Ok(_) => (StatusCode::CREATED, "Key set").into_response(),
         Err(err) => (

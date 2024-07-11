@@ -1,18 +1,19 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 use axum::{routing::get, Router, middleware};
+use bb8_redis::{bb8, RedisConnectionManager};
 use listenfd::ListenFd;
 use mongodb::Client as MongoClient;
-use redis::Client as RedisClient;
-use sea_orm::{Database};
+use sea_orm::{ConnectOptions, Database};
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
-use tokio::sync::{Mutex as TokioMutex, Notify};
+use tokio::sync::{Notify};
 
 use tower_http::timeout::TimeoutLayer;
 #[cfg(unix)]
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::task;
+
 
 pub mod entities;
 pub mod routers;
@@ -20,25 +21,39 @@ pub mod utils;
 pub mod modules;
 mod config;
 
-use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL};
+use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL, SETTINGS};
+
 use utils::state;
 
+pub async fn build_state() -> state::AppState {
+    let mut opt = ConnectOptions::new(DATABASE_URL.to_owned());
+    opt.max_connections(100)
+        .min_connections(5)
+        .connect_timeout(std::time::Duration::from_secs(10))
+        .idle_timeout(std::time::Duration::from_secs(10))
+        .max_lifetime(std::time::Duration::from_secs(10))
+        .sqlx_logging(true);
 
-pub async fn create_app() -> Router {
-    let conn = Database::connect(DATABASE_URL.as_str())
-        .await
-        .expect("Database connection failed");
-    let redis_client = RedisClient::open(REDIS_URL.as_str()).expect("Invalid Redis URL");
-    let redis_connection = redis_client.get_multiplexed_async_connection().await.unwrap();
+    let conn = Database::connect(opt).await.unwrap();
 
+    let redis_manager = RedisConnectionManager::new(REDIS_URL.as_str()).unwrap();
+    let redis_pool = bb8::Pool::builder().build(redis_manager).await.unwrap();
 
     let mongo_client = MongoClient::with_uri_str(MONGO_URL.as_str()).await.expect("failed to connect");
+    state::AppState {
+        conn: Arc::new(conn),
+        redis: redis_pool,
+        mongo: Arc::new(mongo_client),
+    }
+}
 
-    let state = state::AppState {
-        conn: Arc::new(TokioMutex::new(conn)),
-        redis: Arc::new(TokioMutex::new(redis_connection)),
-        mongo: Arc::new(TokioMutex::new(mongo_client)),
-    };
+pub async fn create_app() -> Router {
+    println!("{:?}", SETTINGS.db);
+    println!("{:?}", SETTINGS.mongo);
+    println!("{:?}", SETTINGS.redis);
+
+    let state = build_state().await;
+
     let auth_routers_with_state = routers::auth::auth_routes().with_state(state.clone());
     let {{ lower_model_name }}_routers_with_state = routers::{{ lower_model_name }}::{{ lower_model_name }}_routes().with_state(state.clone());
     let demo_routers_with_state = routers::demo::demo_routes().with_state(state.clone());
@@ -47,7 +62,7 @@ pub async fn create_app() -> Router {
         .nest("/auth", auth_routers_with_state)
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
-        .route_layer(middleware::from_fn(utils::middlewares::jwt_auth))
+        .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::jwt_auth))
         .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))
         .layer((
             TimeoutLayer::new(std::time::Duration::from_secs(10)),

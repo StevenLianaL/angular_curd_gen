@@ -41,8 +41,7 @@ impl AccessLog {
         }
     }
     pub async fn increase(&self, state: State<state::AppState>) {
-        let mongo = state.mongo.lock().await;
-        let db = mongo.database(SETTINGS.mongo.name.as_str());
+        let db = state.mongo.database(SETTINGS.mongo.name.as_str());
         let collection: Collection<AccessLog> = db.collection("log_access_r");
         let filter = doc! {
             "project": &self.project,

@@ -1,0 +1,69 @@
+use std::collections::HashMap;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use serde_json::Value;
+
+
+pub fn json_to_vec<T>(json_str: &str, _marker: T) -> Vec<T>
+    where
+        T: DeserializeOwned + std::fmt::Debug,
+{
+    serde_json::from_str(json_str).unwrap()
+}
+
+pub fn struct_to_hashmap<T>(item: &T) -> HashMap<String, String>
+    where
+        T: Serialize,
+{
+    let json_value: Value = serde_json::to_value(item).unwrap();
+
+    let map = json_value.as_object().unwrap();
+
+    let pairs: HashMap<String, String> = map
+        .iter()
+        .map(|(key, value)| (key.clone(), value.to_string()))
+        .collect();
+
+    pairs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Serialize, Debug)]
+    struct TestStruct {
+        name: String,
+        age: i32,
+    }
+
+    #[test]
+    fn test_struct_to_hashmap() {
+        let test_struct = TestStruct {
+            name: "test".to_string(),
+            age: 18,
+        };
+
+        let kv_pairs = struct_to_hashmap(&test_struct);
+
+        assert_eq!(kv_pairs.len(), 2);
+        assert_eq!(kv_pairs.get("name").unwrap(), "\"test\"");
+    }
+
+    #[test]
+    fn test_json_to_vectors() {
+        let json_str_string = r#"["test1", "test2"]"#;
+        // let vec_str = json_to_vec_string(json_str);
+        let vec_str_string = json_to_vec(json_str_string, String::new());
+
+        assert_eq!(vec_str_string.len(), 2);
+        assert_eq!(vec_str_string[0], "test1");
+        assert_eq!(vec_str_string[1], "test2");
+
+        let json_str_int = r#"[1, 2]"#;
+        let vec_str_int = json_to_vec(json_str_int, 0i32);
+        assert_eq!(vec_str_int.len(), 2);
+        assert_eq!(vec_str_int[0], 1);
+        assert_eq!(vec_str_int[1], 2);
+    }
+}

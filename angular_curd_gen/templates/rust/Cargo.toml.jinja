@@ -3,7 +3,6 @@ name = "{{ app_name }}"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 axum = "0.7.5"
@@ -14,17 +13,30 @@ http-body-util = "0.1.2"
 listenfd = "1.0.1"
 
 config = "0.14.0"
-lazy_static = "1.4.0"
+lazy_static = "1.5.0"
 serde = { version = "1.0.203", features = ["derive"] }
-serde_json = "1.0.117"
+serde_json = "1.0.120"
 
-sea-orm = { version = "0.12.15", features = ["sqlx-mysql", "runtime-async-std-native-tls", "macros"] }
+sea-orm = { version = "1.0.0-rc.7", features = ["sqlx-mysql", "runtime-async-std-native-tls", "macros"] }
 chrono = { version = "0.4.38", features = ["serde"] }
 
-redis= { version = "0.25.4", features = ["aio","tokio-comp"] }
+redis = { version = "0.25.4", features = ["aio", "tokio-comp"] }
+bb8-redis = "0.15.0"
+
 
 bson = "2.11.0"
 mongodb = "3.0.0"
 
 bcrypt = "0.15.1"
-jsonwebtoken = "9"
+jsonwebtoken = "9.3.0"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+openssl = { version = "0.10.64", features = ["vendored"] }
+
+[profile.dev]
+incremental = true
+opt-level = 0
+debug = true
+
+[profile.release]
+lto = true
