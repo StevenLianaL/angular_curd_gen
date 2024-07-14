@@ -37,7 +37,7 @@ pub async fn jwt_auth(mut req: Request, next: Next) -> Result<Response, StatusCo
 
     // suffix
     let url = req.extensions().get::<MatchedPath>().unwrap().as_str().to_string();
-    if not_validate_suffix.iter().any(|&x| url.ends_with(x)) {
+    if not_validate_suffix.iter().any(|&x| url.ends_with(x)) || url == "/" {
         let res = next.run(req).await;
         return Ok(res);
     }
