@@ -115,8 +115,12 @@ class ModelRegister:
         # data
         cursor.execute(f"select * from {self.lower_models_name};")
         self.db_list = cursor.fetchall()
-        self.db_first_id = self.db_list[0]['id']
-        self.db_last_id = self.db_list[-1]['id']
+        try:
+            self.db_first_id = self.db_list[0]['id']
+            self.db_last_id = self.db_list[-1]['id']
+        except IndexError:
+            self.db_first_id = 0
+            self.db_last_id = 0
 
         # field count
         sql = ("select " +
@@ -279,7 +283,7 @@ class ModelRegister:
     def _to_test_folder(self):
         """Copy all files to test folder"""
         shutil.copytree(str(self.output_angular_dir), "W:/projects/work/ForCodeGen/src/app/game", dirs_exist_ok=True)
-        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/health_videos", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/transactions", dirs_exist_ok=True)
 
 
 @dataclass
