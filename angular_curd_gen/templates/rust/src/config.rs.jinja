@@ -20,9 +20,9 @@ lazy_static! {
             .set_default("redis.host", "127.0.0.1").unwrap()
             .set_default("redis.port", 6379).unwrap()
             .set_default("redis.db",0).unwrap()
-            .set_default("jwt_iss","Yingde").unwrap()
-            .set_default("jwt_secret","YD-SECRET").unwrap()
-            .set_default("jwt_expire",24).unwrap()
+            .set_default("jwt.iss","demo iss").unwrap()
+            .set_default("jwt.secret","demo secret").unwrap()
+            .set_default("jwt.expire",24).unwrap()
             .add_source(Environment::with_prefix("PREFIX").separator("_"));
 
         builder.build().unwrap().try_deserialize().unwrap()

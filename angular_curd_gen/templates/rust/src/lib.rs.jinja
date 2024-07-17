@@ -48,9 +48,7 @@ pub async fn build_state() -> state::AppState {
 }
 
 pub async fn create_app() -> Router {
-    println!("{:?}", SETTINGS.db);
-    println!("{:?}", SETTINGS.mongo);
-    println!("{:?}", SETTINGS.redis);
+    println!("{:#?}", *SETTINGS);
 
     let state = build_state().await;
 

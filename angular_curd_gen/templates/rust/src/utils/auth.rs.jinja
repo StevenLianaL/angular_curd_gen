@@ -4,6 +4,13 @@ use jsonwebtoken::{decode, DecodingKey, encode, EncodingKey, Header, Validation}
 use serde::{Deserialize, Serialize};
 use crate::config::SETTINGS;
 
+#[derive(Debug, Deserialize)]
+pub struct JwtSettings {
+    pub iss: String,
+    pub secret: String,
+    pub expire: i64,
+}
+
 pub struct PasswordManager {
     pub prefix: String,
 }
@@ -43,23 +50,23 @@ impl JwtManager {
     pub fn gen_token(user_id: i64) -> String {
         let now = Utc::now();
         let now_stamp = now.timestamp();
-        let exp_stamp = (now + chrono::Duration::hours(SETTINGS.jwt_expire)).timestamp();
+        let exp_stamp = (now + chrono::Duration::hours(SETTINGS.jwt.expire)).timestamp();
         let my_claims = Claims {
             exp: exp_stamp,
             iat: now_stamp,
-            iss: SETTINGS.jwt_iss.clone(),
+            iss: SETTINGS.jwt.iss.clone(),
             user_id,
         };
         let token = encode(
             &Header::default(),
-            &my_claims, &EncodingKey::from_secret(SETTINGS.jwt_secret.as_ref())).unwrap();
+            &my_claims, &EncodingKey::from_secret(SETTINGS.jwt.secret.as_ref())).unwrap();
         token
     }
 
     pub fn decode_token(token: String) -> Claims {
         let claims = decode::<Claims>(
             &token,
-            &DecodingKey::from_secret(SETTINGS.jwt_secret.as_ref()),
+            &DecodingKey::from_secret(SETTINGS.jwt.secret.as_ref()),
             &Validation::default()).unwrap();
         claims.claims
     }
