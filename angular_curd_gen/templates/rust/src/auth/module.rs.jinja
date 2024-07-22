@@ -1,0 +1,8 @@
+use lazy_static::lazy_static;
+use crate::auth::utils::PasswordManager;
+
+lazy_static! {
+    pub static ref PASSWORD_MANAGER: PasswordManager = PasswordManager::new(
+        "".to_string()
+    );
+}

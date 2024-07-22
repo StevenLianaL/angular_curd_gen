@@ -5,12 +5,11 @@ use axum::{Json, Router};
 use axum::routing::{post};
 use sea_orm::{EntityTrait, ColumnTrait, QueryFilter};
 use serde_json::json;
-use crate::entities::models::auth::LoginRequest;
-use crate::entities::tables::{user, User};
 use crate::{error, info};
-use crate::entities::models;
-use crate::modules::auth::PASSWORD_MANAGER;
-use crate::utils::auth::JwtManager;
+use crate::auth::models;
+use crate::auth::module::PASSWORD_MANAGER;
+use crate::auth::tables::{user, User};
+use crate::auth::utils::JwtManager;
 use crate::utils::state;
 
 pub fn auth_routes() -> Router<state::AppState> {
@@ -18,7 +17,7 @@ pub fn auth_routes() -> Router<state::AppState> {
         .route("/login", post(login))
 }
 
-async fn login(state: State<state::AppState>, Json(payload): Json<LoginRequest>) -> Response {
+async fn login(state: State<state::AppState>, Json(payload): Json<models::LoginRequest>) -> Response {
     info!(&format!("payload.username: {}",payload.username), 0, state.clone());
 
     // user
@@ -40,7 +39,7 @@ async fn login(state: State<state::AppState>, Json(payload): Json<LoginRequest>)
     }
 
     // jwt
-    let res = models::auth::LoginResponse {
+    let res = models::LoginResponse {
         id: user.id,
         username: user.username,
         jwt: JwtManager::gen_token(user.id),

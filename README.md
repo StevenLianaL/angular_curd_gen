@@ -8,7 +8,7 @@
 ## Usage
 - generate angular codes
 ```python
-# declare model by pydantic, must single(User) not plural(Users)
+# declare model_pos by pydantic, must single(User) not plural(Users)
 class User(BaseModel):
     id: int
     username: str
@@ -25,7 +25,7 @@ class User(BaseModel):
     active: int
     created: datetime
 
-# declare model admin
+# declare model_pos admin
 class UserAdmin(ModelAdmin):
     model_fields = ('id', 'username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active', 'created')
     list_display_restraint = model_fields

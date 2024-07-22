@@ -15,11 +15,11 @@ use tokio::signal::unix::{signal, SignalKind};
 use tokio::task;
 
 
-pub mod entities;
-pub mod routers;
+pub mod demo;
+pub mod auth;
+pub mod {{ lower_model_name }};
 pub mod utils;
-pub mod modules;
-mod config;
+pub mod config;
 
 use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL, SETTINGS};
 
@@ -52,16 +52,16 @@ pub async fn create_app() -> Router {
 
     let state = build_state().await;
 
-    let auth_routers_with_state = routers::auth::auth_routes().with_state(state.clone());
-    let {{ lower_model_name }}_routers_with_state = routers::{{ lower_model_name }}::{{ lower_model_name }}_routes().with_state(state.clone());
-    let demo_routers_with_state = routers::demo::demo_routes().with_state(state.clone());
+    let auth_routers_with_state = auth::routers::default::auth_routes().with_state(state.clone());
+    let {{ lower_model_name }}_routers_with_state = {{ lower_model_name }}::routers::default::{{ lower_model_name }}_routes().with_state(state.clone());
+    let demo_routers_with_state = demo::routers::default::demo_routes().with_state(state.clone());
     let app = Router::new()
         .route("/", get(|| async { "Hello, W1111!" }))
         .nest("/auth", auth_routers_with_state)
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
-        .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::jwt_auth))
-        .route_layer(middleware::from_fn_with_state(state.clone(), utils::middlewares::log_req_access_times))
+        .route_layer(middleware::from_fn_with_state(state.clone(), auth::middlewares::jwt_auth))
+        .route_layer(middleware::from_fn_with_state(state.clone(), auth::middlewares::log_req_access_times))
         .layer((
             TimeoutLayer::new(std::time::Duration::from_secs(10)),
             CorsLayer::new()

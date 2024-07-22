@@ -2,7 +2,7 @@ use axum::{
     http::StatusCode,
 };
 use http_body_util::BodyExt;
-use {{ app_name }}::utils::auth::JwtManager;
+use {{ app_name }}::auth::utils::JwtManager;
 use {{ app_name }}::utils::test::{delete_response, get_response, post_response, put_response};
 
 

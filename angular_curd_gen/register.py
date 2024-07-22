@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import MySQLdb
-import inflect
 from jinja2 import FileSystemLoader, Environment
 from parse import parse
 from pydantic import BaseModel
@@ -32,16 +31,16 @@ class ModelRegister:
     db_first_id = 0
     db_last_id = 0
 
-    # extract model info
+    # extract model_pos info
     model_name = ''  # is single
     models_name = ''  # is plural
     lower_model_name = ''
     lower_models_name = ''
-    model_fields_map = None  # all model fields with type dict[str,type]
+    model_fields_map = None  # all model_pos fields with type dict[str,type]
     jinja_env = None
     output_angular_dir = ''
 
-    # extract model admin info
+    # extract model_pos admin info
     model_admin_fields = ()
 
     def register(self):
@@ -54,7 +53,7 @@ class ModelRegister:
         self._to_test_folder()
 
     def _prepare(self):
-        # model
+        # model_pos
 
         self.app_title_name = self.app_name.title()
 
@@ -67,7 +66,7 @@ class ModelRegister:
 
         self.model_fields_map = self.model.__dict__['__annotations__']
 
-        # model admin
+        # model_pos admin
         self.model_admin_fields = tuple([i for i in dir(self.model_admin) if not i.startswith('_')])
         if not self.model_admin.model_translate_fields:
             self.model_admin.model_translate_fields = self.model_admin.model_fields
@@ -81,11 +80,6 @@ class ModelRegister:
         self.out_app_dir = Path(f"{self.app_name}")
 
         self.out_rust_dir = self.out_app_dir / BACKEND_TEMPLATE_DIR
-        self.out_rust_src_dir = self.out_rust_dir / 'src'
-        self.our_rust_tests_dir = self.out_rust_dir / 'tests'
-        self.out_rust_src_entities_dir = self.out_rust_src_dir / "entities"
-        self.out_rust_src_entity_models_dir = self.out_rust_src_entities_dir / "models"
-        self.out_rust_src_entity_tables_dir = self.out_rust_src_entities_dir / "tables"
 
         self.output_angular_dir = self.out_app_dir / FRONTEND_TEMPLATE_DIR / self.app_name
         self.output_angular_lower_model_name_dir = self.output_angular_dir / self.lower_model_name
@@ -102,7 +96,7 @@ class ModelRegister:
                     attr_value.mkdir(parents=True, exist_ok=True)
 
     def _prepare_data(self):
-        """Query model data, to count frontend component."""
+        """Query model_pos data, to count frontend component."""
         db_config = {
             'host': 'localhost',
             'user': self.db_user,
@@ -147,6 +141,7 @@ class ModelRegister:
         :param project: angular/rust
         :return:
         """
+        print(f"draw template {template_name=} to {target=} {project=}")
         template = self._load_template(template_name)
         context = self._build_context()
         rendered_content = template.render(context)
@@ -158,15 +153,17 @@ class ModelRegister:
             case _:
                 raise ValueError(f"not support project {project}")
 
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
         with output_file.open('w', encoding='utf8') as file:
             file.write(rendered_content)
 
-    def _draw_component(self, component_name: str, level: str = 'model'):
+    def _draw_component(self, component_name: str, level: str = 'model_pos'):
         templates = ['ts', 'css', 'html', 'spec.ts']
         for template in templates:
             template_name = f'{component_name}_component/{template}.jinja'
             match level:
-                case 'model':
+                case 'model_pos':
                     target_prefix = f"{self.lower_model_name}-{component_name}"
                     father_dir = self.output_angular_dir / self.lower_model_name / target_prefix
                     target_dir = f"{self.lower_model_name}/{target_prefix}"
@@ -283,7 +280,7 @@ class ModelRegister:
     def _to_test_folder(self):
         """Copy all files to test folder"""
         shutil.copytree(str(self.output_angular_dir), "W:/projects/work/ForCodeGen/src/app/game", dirs_exist_ok=True)
-        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/transactions", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/web-base", dirs_exist_ok=True)
 
 
 @dataclass
@@ -323,7 +320,7 @@ class AngularModelRegister(ModelRegister):
     def gen_e_model_components(self):
         components = ['list', 'creator', 'updater']
         for component in components:
-            self._draw_component(component_name=component, level='model')
+            self._draw_component(component_name=component, level='model_pos')
 
 
 @dataclass
@@ -333,59 +330,16 @@ class RustModelRegister(ModelRegister):
     def gen_f_rust_project_files(self):
         """Generate rust project root files"""
         rust_template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR
-        for file in rust_template_dir.iterdir():
-            if file.is_file() and file.name.endswith('.jinja'):
-                template_name = file.name.removesuffix('.jinja')
+        for file_or_dir in rust_template_dir.rglob('*'):
+            if file_or_dir.is_file():
+                new_f_or_d = Path(str(file_or_dir).replace('model_pos', self.lower_model_name))
+                template_path = file_or_dir.relative_to(TEMPLATE_DIR)
+                target_path = new_f_or_d.relative_to(rust_template_dir)
+                template_name = f"{template_path.parent / template_path.name}".replace('\\', '/')
                 self._draw_template(
-                    template_name=f"{BACKEND_TEMPLATE_DIR}/{file.name}",
-                    target=template_name, project=BACKEND_TEMPLATE_DIR)
-
-    def gen_g_rust_scripts(self):
-        """Generate rust scripts in src"""
-        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
-        for file in template_dir.iterdir():
-            if file.is_file() and file.name.endswith('.jinja'):
-                template_name = file.name.removesuffix('.jinja')
-                self._draw_template(
-                    template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file.name}",
-                    target=f"src/{template_name}", project=BACKEND_TEMPLATE_DIR)
-
-    def gen_h_rust_sub_modules(self):
-        """Generate rust src sub modules"""
-        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'src'
-
-        for folder in template_dir.iterdir():
-            if folder.is_dir():
-                (self.out_rust_src_dir / folder.name).mkdir(parents=True, exist_ok=True)
-                for first_level_file in folder.iterdir():
-                    if first_level_file.is_dir():
-                        for second_level_file in first_level_file.iterdir():
-                            template_name = second_level_file.name.removesuffix('.jinja')
-                            file_path = f"{folder.name}/{first_level_file.name}"
-                            target = f"src/{file_path}/{template_name}".replace(
-                                'model.rs', f"{self.lower_model_name}.rs"
-                            )
-                            self._draw_template(
-                                template_name=f"{BACKEND_TEMPLATE_DIR}/src/{file_path}/{second_level_file.name}",
-                                target=target, project=BACKEND_TEMPLATE_DIR
-                            )
-
-                    if first_level_file.is_file() and first_level_file.name.endswith('.jinja'):
-                        template_name = first_level_file.name.removesuffix('.jinja')
-                        target = f"src/{folder.name}/{template_name}".replace('model', self.lower_model_name)
-                        self._draw_template(
-                            template_name=f"{BACKEND_TEMPLATE_DIR}/src/{folder.name}/{first_level_file.name}",
-                            target=target, project=BACKEND_TEMPLATE_DIR)
-
-    def gen_t_rust_tests(self):
-        template_dir = Path(TEMPLATE_DIR) / BACKEND_TEMPLATE_DIR / 'tests'
-        for file in template_dir.iterdir():
-            if file.is_file() and file.name.endswith('.jinja'):
-                template_name = file.name.removesuffix('.jinja')
-                target = f"tests/{template_name}".replace('model', self.lower_model_name)
-                self._draw_template(
-                    template_name=f"{BACKEND_TEMPLATE_DIR}/tests/{file.name}",
-                    target=target, project=BACKEND_TEMPLATE_DIR)
+                    template_name=template_name,
+                    target=str(target_path.parent / target_path.stem), project=BACKEND_TEMPLATE_DIR
+                )
 
 
 def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin,

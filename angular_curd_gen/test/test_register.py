@@ -7,54 +7,6 @@ from angular_curd_gen.field import Image, Url
 from angular_curd_gen.register import ModelAdmin, generate_whole_app
 
 
-class Users(BaseModel):
-    id: int
-    username: str
-    password: Optional[str] = None
-    firstname: str
-    lastname: str
-    nickname: str = ''
-    gender: str
-    birthday: date
-    role: str
-    email: str
-    mobile: str
-    address: str
-    active: bool
-    created: datetime
-
-
-class Apps(BaseModel):
-    id: int
-    name: str
-    appkey: str
-    secret: str
-    producer: str
-
-
-class UsersAdmin(ModelAdmin):
-    """用户管理注释文档信息"""
-    model_readable_name = '用户'
-    model_fields = ('id', 'username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active', 'created')
-    list_display_restraint = model_fields
-    list_editable_restraint = ('username', 'gender')
-    list_filter_fields = ('id', 'username', 'role', 'gender', 'active', 'birthday')
-    model_edit_fields = ('username', 'lastname', 'firstname', 'gender', 'birthday', 'active')
-    model_create_fields = ('username', 'lastname', 'firstname', 'gender', 'birthday', 'role', 'active')
-    model_translate_fields = ('ID', '用户名', '姓氏', '名字', '性别', '生日', '角色', '是否激活', '创建时间')
-
-
-class AppsAdmin(ModelAdmin):
-    """应用管理注释文档信息"""
-    model_readable_name = '应用'
-    model_fields = ('id', 'name', 'appkey', 'secret', 'producer')
-    list_display_restraint = model_fields
-    list_editable_restraint = ('name', 'producer')
-    model_edit_fields = ('name', 'appkey', 'secret', 'producer')
-    model_create_fields = model_edit_fields
-    model_translate_fields = ('ID', '名称', 'AppKey', 'Secret', '生产者')
-
-
 class GameInfo(BaseModel):
     id: int
     link: Url
@@ -107,11 +59,37 @@ class VideosAdmin:
                               '分类', '节', '年级', '学科覆盖', '领域', '来源')
 
 
+class Trades(BaseModel):
+    id: int
+    self_trade_no: str
+    out_trade_no: str
+    name: str
+    product_id: int
+    user_id: int
+    price: float
+    is_paid: bool
+    pay_method: str
+    created: datetime
+
+
+class TradesAdmin:
+    model_readable_name = '交易'
+    model_fields = ('id', 'self_trade_no', 'out_trade_no', 'name', 'product_id', 'user_id', 'price',
+                    'is_paid', 'pay_method', 'created')
+    list_display_restraint = ('id', 'name', 'product_id', 'user_id', 'price', 'is_paid', 'pay_method', 'created')
+    list_editable_restraint = ()
+    list_filter_fields = ('name', 'is_paid', 'product_id', 'pay_method')
+    list_sort_fields = ('price', 'created')
+    model_edit_fields = ('name', 'price')
+    model_create_fields = ('self_trade_no', 'out_trade_no', 'name', 'product_id', 'user_id', 'price', 'pay_method')
+    model_translate_fields = (
+        'ID', '交易号', '外部交易号', '商品名称', '商品ID', '用户ID', '价格', '是否支付', '支付方式', '创建时间')
+
+
 def test_register():
-    # generate_whole_app(model_admin=UsersAdmin, model=Users, app_name='first', app_readable_name='第一个应用',
+    # generate_whole_app(model_admin=UsersAdmin, model_pos=Users, app_name='first', app_readable_name='第一个应用',
     #                    db_name='yd_user', db_user='test', db_pswd='test')
-    # generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
-    #                    db_name='game_search', db_user='test', db_pswd='test')
-    # generate_whole_app(model_admin=AppsAdmin, model=Apps, app_name='first', app_readable_name='纯应用')
-    generate_whole_app(model_admin=VideosAdmin, model=Video, app_name='video', app_readable_name='视频管理',
-                       db_name='health_videos', db_user='test', db_pswd='test')
+    generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
+                       db_name='game_search', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=TradesAdmin, model_pos=Trades, app_name='auto_tasks', app_readable_name='自动任务',
+    #                    db_name='transactions', db_user='test', db_pswd='test')

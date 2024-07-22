@@ -1,7 +1,0 @@
-use lazy_static::lazy_static;
-use crate::utils;
-lazy_static! {
-    pub static ref PASSWORD_MANAGER: utils::auth::PasswordManager = utils::auth::PasswordManager::new(
-        "".to_string()
-    );
-}

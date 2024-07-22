@@ -1,0 +1,10 @@
+use lazy_static::lazy_static;
+use crate::utils;
+
+lazy_static! {
+    pub static ref MODULE_SETTINGS: utils::settings::ModuleSettings = {
+        utils::settings::ModuleSettings {
+            name: "{{ app_name }}".to_string(),
+        }
+    };
+}

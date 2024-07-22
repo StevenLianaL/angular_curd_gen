@@ -1,9 +1,64 @@
 {% set left = '{{' -%}
 use axum::extract::State;
+use bson::{doc};
+use mongodb::Collection;
+use serde::{Deserialize, Serialize};
 use crate::config::SETTINGS;
-use crate::{entities};
 use crate::utils::state;
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewLogRecord {
+    pub app: String,
+    pub func: String,
+    pub log: String,
+    pub project: String,
+    pub user: i64,
+    pub level: String,
+    pub created: bson::DateTime,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AccessLog {
+    pub project: String,
+    pub app: String,
+    pub url: String, // method and uri name, because function name cannot get from request
+    pub method: String,
+    count: i64,
+    month: String,
+}
+
+
+impl AccessLog {
+    pub fn new(project: String, app: String, url: String, method: String) -> Self {
+        let month = chrono::Utc::now().format("%Y-%m").to_string();
+
+        Self {
+            project,
+            app,
+            url,
+            method,
+            count: 1,
+            month,
+        }
+    }
+    pub async fn increase(&self, state: State<state::AppState>) {
+        let db = state.mongo.database(SETTINGS.mongo.name.as_str());
+        let collection: Collection<AccessLog> = db.collection("log_access_r");
+        let filter = doc! {
+            "project": &self.project,
+            "app": &self.app,
+            "url": &self.url,
+            "month": &self.month,
+            "method": &self.method,
+        };
+
+        let update = doc! {
+            "$inc": { "count": 1 },
+        };
+
+        collection.find_one_and_update(filter, update).upsert(true).await.unwrap();
+    }
+}
 
 pub struct MongoLogger {
     pub project: String,
@@ -21,7 +76,7 @@ impl MongoLogger {
     pub async fn log(&self, log: &str, user: i64, state: State<state::AppState>, func: &str, level: &str) {
         let db = state.mongo.database(SETTINGS.mongo.name.as_str());
         let collection = db.collection("log_record");
-        let payload = entities::models::log::NewLogRecord {
+        let payload = NewLogRecord {
             app: self.app.clone(),
             func: func.to_string(),
             log: log.to_string(),

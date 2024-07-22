@@ -5,7 +5,7 @@ use axum::routing::{get, post};
 use redis::AsyncCommands;
 use axum::http::StatusCode;
 use serde_json::json;
-use crate::entities::models::demo::{RedisKey, RedisKeyValue};
+use crate::demo::models;
 use crate::info;
 use crate::utils::state;
 
@@ -16,10 +16,10 @@ pub fn demo_routes() -> Router<state::AppState> {
         .route("/jwt/demo", get(get_jwt_user_id))
 }
 
-async fn get_by_redis(state: State<state::AppState>, Query(params): Query<RedisKey>) -> Response {
+async fn get_by_redis(state: State<state::AppState>, Query(params): Query<models::RedisKey>) -> Response {
     info!(&format!("params: {params:?}"), 0, state.clone());
 
-    let mut redis =state.redis.get().await.unwrap();
+    let mut redis = state.redis.get().await.unwrap();
     match redis.get::<_, Option<String>>(&params.key).await {
         Ok(Some(value)) => (StatusCode::OK, value).into_response(),
         Ok(None) => (
@@ -33,10 +33,10 @@ async fn get_by_redis(state: State<state::AppState>, Query(params): Query<RedisK
     }
 }
 
-async fn set_redis_key(state: State<state::AppState>, Json(payload): Json<RedisKeyValue>) -> Response {
+async fn set_redis_key(state: State<state::AppState>, Json(payload): Json<models::RedisKeyValue>) -> Response {
     info!(&format!("payload: {payload:?}"), 0, state.clone());
 
-    let mut redis =state.redis.get().await.unwrap();
+    let mut redis = state.redis.get().await.unwrap();
     match redis.set::<_, _, ()>(&payload.key, &payload.value).await {
         Ok(_) => (StatusCode::CREATED, "Key set").into_response(),
         Err(err) => (
