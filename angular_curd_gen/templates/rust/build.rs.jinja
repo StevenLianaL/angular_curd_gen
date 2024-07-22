@@ -1,0 +1,19 @@
+use std::env;
+use std::fs;
+use std::path::PathBuf;
+
+fn main() {
+    let profile = env::var("PROFILE").unwrap();
+    let env_file = match profile.as_str() {
+        "release" => "release.toml",
+        _ => "debug.toml",
+    };
+
+    let env_content = fs::read_to_string(env_file)
+        .expect("Failed to read the env toml file");
+
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let dest_path = PathBuf::from(out_dir).join("env_vars.rs");
+    fs::write(&dest_path, format!("pub const ENV_VARS: &str = r#\"{}\"#;", env_content))
+        .expect("Failed to write the env vars file");
+}

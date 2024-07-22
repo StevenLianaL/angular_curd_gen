@@ -1,30 +1,16 @@
-use config::{Config, Environment};
+use config::{Config, File, FileFormat};
 use lazy_static::lazy_static;
 use crate::utils;
+
+include!(concat!(env!("OUT_DIR"), "/env_vars.rs"));
 
 pub static PROJECT: &str = "{{ app_title_name }}"; // only use when SETTINGS is not available
 
 lazy_static! {
     pub static ref SETTINGS: utils::settings::Settings = {
         let builder = Config::builder()
-            .set_default("debug", true).unwrap()
             .set_default("project", PROJECT).unwrap()
-            .set_default("port", 8000).unwrap()
-            .set_default("db.name", "{{ db_name }}").unwrap()
-            .set_default("db.port", 3306).unwrap()
-            .set_default("mongo.host", "localhost").unwrap()
-            .set_default("mongo.port", 27017).unwrap()
-            .set_default("mongo.name", "record").unwrap()
-            .set_default("mongo.user", "test").unwrap()
-            .set_default("mongo.pswd", "test").unwrap()
-            .set_default("redis.host", "127.0.0.1").unwrap()
-            .set_default("redis.port", 6379).unwrap()
-            .set_default("redis.db",0).unwrap()
-            .set_default("jwt.iss","demo iss").unwrap()
-            .set_default("jwt.secret","demo secret").unwrap()
-            .set_default("jwt.expire",24).unwrap()
-            .add_source(Environment::with_prefix("PREFIX").separator("_"));
-
+            .add_source(File::from_str(ENV_VARS, FileFormat::Toml));
         builder.build().unwrap().try_deserialize().unwrap()
     };
 

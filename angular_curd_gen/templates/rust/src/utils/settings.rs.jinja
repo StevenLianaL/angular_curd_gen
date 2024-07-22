@@ -3,7 +3,6 @@ use crate::utils;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
-    pub debug: bool,
     pub project: String,
     pub port: u16,
     pub db: utils::db::DatabaseSettings,
