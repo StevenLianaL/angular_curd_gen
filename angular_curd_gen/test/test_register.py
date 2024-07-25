@@ -86,10 +86,16 @@ class TradesAdmin:
         'ID', '交易号', '外部交易号', '商品名称', '商品ID', '用户ID', '价格', '是否支付', '支付方式', '创建时间')
 
 
+def test_register_game():
+    generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
+                       db_name='game_search', db_user='test', db_pswd='test')
+
+
 def test_register():
     # generate_whole_app(model_admin=UsersAdmin, model_pos=Users, app_name='first', app_readable_name='第一个应用',
     #                    db_name='yd_user', db_user='test', db_pswd='test')
-    generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
-                       db_name='game_search', db_user='test', db_pswd='test')
-    # generate_whole_app(model_admin=TradesAdmin, model_pos=Trades, app_name='auto_tasks', app_readable_name='自动任务',
-    #                    db_name='transactions', db_user='test', db_pswd='test')
+
+    # generate_whole_app(model_admin=VideosAdmin, model=Video, app_name='health_videos', app_readable_name='视频平台',
+    #                    db_name='health_videos', db_user='test', db_pswd='test')
+    generate_whole_app(model_admin=TradesAdmin, model=Trades, app_name='auto_tasks', app_readable_name='自动任务',
+                       db_name='transactions', db_user='test', db_pswd='test')

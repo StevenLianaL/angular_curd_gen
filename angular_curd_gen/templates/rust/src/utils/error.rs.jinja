@@ -1,0 +1,25 @@
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum WebError {
+    #[error("unauthorized: {0}")]
+    Unauthorized(String),
+
+    #[error("token time expired")]
+    TokenExpire,
+
+    #[error("No Authed Source Access: {0}")]
+    NoSourceAccess(String),
+}
+
+impl IntoResponse for WebError {
+    fn into_response(self) -> Response {
+        match self {
+            WebError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg).into_response(),
+            WebError::TokenExpire => (StatusCode::FORBIDDEN, self.to_string()).into_response(),
+            WebError::NoSourceAccess(msg) => (StatusCode::FORBIDDEN, msg).into_response(),
+        }
+    }
+}

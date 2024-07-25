@@ -24,7 +24,7 @@ pub async fn jwt_auth(mut req: Request, next: Next) -> Result<Response, StatusCo
     let jwt_header_name = "jwt"; // or can be Authorization
 
     let not_validate_suffix = vec![
-        "docs", "openapi.json", "login", "register", "safe", "demo", "access",
+        "docs", "openapi.json", "login", "register", "safe", "demo", "access", "anonymous",
     ];
     let req_method = req.method().to_string();
 
@@ -51,14 +51,17 @@ pub async fn jwt_auth(mut req: Request, next: Next) -> Result<Response, StatusCo
         let response = (StatusCode::UNAUTHORIZED, "without jwt").into_response();
         Ok(response)
     } else {
-        let payload: auth::utils::Claims = auth::utils::JwtManager::decode_token(token);
-        if payload.exp < chrono::Utc::now().timestamp() {
-            let response = (StatusCode::UNAUTHORIZED, "jwt timeout").into_response();
-            Ok(response)
-        } else {
-            req.extensions_mut().insert(payload.user_id.clone());
-            let res = next.run(req).await;
-            Ok(res)
+        let payload_result = auth::utils::JwtManager::decode_token(token);
+        match payload_result {
+            Ok(payload) => {
+                req.extensions_mut().insert(payload.user_id.clone());
+                let res = next.run(req).await;
+                Ok(res)
+            }
+            Err(_) => {
+                let response = (StatusCode::UNAUTHORIZED, "jwt timeout").into_response();
+                Ok(response)
+            }
         }
     };
 }

@@ -63,12 +63,12 @@ impl JwtManager {
         token
     }
 
-    pub fn decode_token(token: String) -> Claims {
+    pub fn decode_token(token: String) -> anyhow::Result<Claims> {
         let claims = decode::<Claims>(
             &token,
             &DecodingKey::from_secret(SETTINGS.jwt.secret.as_ref()),
-            &Validation::default()).unwrap();
-        claims.claims
+            &Validation::default())?;
+        Ok(claims.claims)
     }
 }
 
@@ -102,7 +102,7 @@ mod tests {
     fn test_decode_token() {
         let user_id = 1;
         let token = JwtManager::gen_token(user_id);
-        let claims = JwtManager::decode_token(token);
+        let claims = JwtManager::decode_token(token).unwrap();
         assert_eq!(claims.user_id, user_id);
     }
 }
