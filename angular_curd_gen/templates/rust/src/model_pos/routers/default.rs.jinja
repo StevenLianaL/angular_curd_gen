@@ -6,10 +6,18 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use sea_orm::ActiveValue::Set;
+use utoipa::OpenApi;
 use crate::{{ lower_model_name }}::models;
 use crate::{{ lower_model_name }}::tables::{{ single_left }}{{ model_name }}, {{ lower_model_name }}};
 use crate::info;
 use crate::utils::state;
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(get_{{ lower_models_name }}, get_{{ lower_model_name }}, create_{{ lower_model_name }}, update_{{ lower_model_name }}, delete_{{ lower_model_name }}),
+    components(schemas({{ lower_model_name }}::Model, models::{{ model_name }}Creatable, models::{{ model_name }}Editable))
+)]
+pub struct {{ model_name }}Api;
 
 pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
     Router::new()
@@ -17,6 +25,17 @@ pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
         .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
 }
 
+#[utoipa::path(
+    get,
+    path = "/{{ lower_models_name }}",
+    params(
+        models::{{ model_name }}Filter,
+        ("jwt" = String, Header, description = "jwt token"),
+    ),
+    responses(
+        (status = 200, description = "查询{{ model_name }}列表", body = [Model]),
+    )
+)]
 async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter): Query<models::{{ model_name }}Filter>) -> Response {
     info!(&format!("filter: {filter:?}"), 0, state.clone());
 
@@ -36,6 +55,17 @@ async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter
     (StatusCode::OK, Json({{ lower_models_name }})).into_response()
 }
 
+#[utoipa::path(
+    get,
+    path = "/{{ lower_models_name }}/{{ single_left }}{{ lower_model_name }}_id}",
+    responses(
+        (status = 200, description = "查询{{ model_name }}成功"),
+    ),
+    params(
+        ("{{ lower_model_name }}_id" = i64, Path, description = "{{ model_name }} id"),
+        ("jwt" = String, Header, description = "jwt token"),
+    ),
+)]
 async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> Response {
     info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
 
@@ -43,6 +73,17 @@ async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower
     (StatusCode::OK, Json({{ lower_model_name }})).into_response()
 }
 
+#[utoipa::path(
+    post,
+    path = "/{{ lower_models_name }}",
+    request_body = {{ model_name }}Creatable,
+    params(
+        ("jwt" = String, Header, description = "jwt token"),
+    ),
+    responses(
+    (status = 201, description = "创建{{ model_name }}成功", body = Model),
+    )
+)]
 async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(payload): Json<models::{{ model_name }}Creatable>) -> Response {
     info!(&format!("payload: {payload:?}"), 0, state.clone());
 
@@ -56,6 +97,18 @@ async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(paylo
     (StatusCode::CREATED, Json({{ lower_model_name }})).into_response()
 }
 
+#[utoipa::path(
+    put,
+    path = "/{{ lower_models_name }}/{{ single_left }}{{ lower_model_name }}_id}",
+    request_body = {{ model_name }}Editable,
+    params(
+        ("{{ lower_model_name }}_id" = i64, Path, description = "{{ model_name }} id"),
+        ("jwt" = String, Header, description = "jwt token"),
+    ),
+    responses(
+    (status = 200, description = "更新{{ model_name }}成功", body = Model),
+    ),
+)]
 async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<models::{{ model_name }}Editable>) -> impl IntoResponse {
     info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}, payload: {payload:?}"), 0, state.clone());
 
@@ -68,7 +121,17 @@ async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lo
     (StatusCode::OK, Json(updated_{{ lower_model_name }})).into_response()
 }
 
-
+#[utoipa::path(
+    delete,
+    path = "/{{ lower_models_name }}/{{ single_left }}{{ lower_model_name }}_id}",
+    params(
+        ("{{ lower_model_name }}_id" = i64, Path, description = "{{ model_name }} id"),
+        ("jwt" = String, Header, description = "jwt token"),
+    ),
+    responses(
+        (status = 204, description = "delete success"),
+    ),
+)]
 async fn delete_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
     info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
 

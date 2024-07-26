@@ -24,7 +24,8 @@ pub async fn jwt_auth(mut req: Request, next: Next) -> Result<Response, StatusCo
     let jwt_header_name = "jwt"; // or can be Authorization
 
     let not_validate_suffix = vec![
-        "docs", "openapi.json", "login", "register", "safe", "demo", "access", "anonymous",
+        "docs", "login", "register", "safe", "demo", "access", "anonymous",
+        "rapidoc", "openapi.json", "openapi2.json", "redoc",
     ];
     let req_method = req.method().to_string();
 

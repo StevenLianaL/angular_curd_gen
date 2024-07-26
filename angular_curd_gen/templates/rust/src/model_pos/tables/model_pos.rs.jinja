@@ -2,14 +2,19 @@
 {% set edit_model = model_name+'Editable' -%}
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 {% if model_fields_type_map -%}
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Deserialize, Serialize, ToSchema)]
 #[sea_orm(table_name = "{{ lower_models_name }}")]
 pub struct Model {
     #[sea_orm(primary_key)]
 {%- for field,field_type in model_fields_type_map.items() %}
-    pub {{ field }}: {{ cls.map_rust_type(field_type) }}{% if not loop.last %},{% endif %}
+    {% set rust_field_type = cls.map_rust_type(field_type) -%}
+    {% if rust_field_type == "DateTime" -%}
+    #[schema(value_type = String, format = Date)]
+    {% endif -%}
+    pub {{ field }}: {{ rust_field_type }}{% if not loop.last %},{% endif %}
 {%- endfor %}
 }
 {% endif %}

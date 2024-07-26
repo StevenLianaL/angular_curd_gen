@@ -5,6 +5,7 @@ use axum::{Json, Router};
 use axum::routing::{post};
 use sea_orm::{EntityTrait, ColumnTrait, QueryFilter};
 use serde_json::json;
+use utoipa::OpenApi;
 use crate::{error, info};
 use crate::auth::models;
 use crate::auth::module::PASSWORD_MANAGER;
@@ -12,11 +13,27 @@ use crate::auth::tables::{user, User};
 use crate::auth::utils::JwtManager;
 use crate::utils::state;
 
+#[derive(OpenApi)]
+#[openapi(
+    paths(login),
+    components(schemas(models::LoginRequest, models::LoginResponse))
+)]
+pub struct AuthApi;
+
 pub fn auth_routes() -> Router<state::AppState> {
     Router::new()
         .route("/login", post(login))
 }
 
+#[utoipa::path(
+    post,
+    path = "/login",
+    request_body = LoginRequest,
+    responses(
+    (status = 200, description = "login success", body = LoginResponse),
+    (status = 400, description = "UserNotFound or PasswordError"),
+    )
+)]
 async fn login(state: State<state::AppState>, Json(payload): Json<models::LoginRequest>) -> Response {
     info!(&format!("payload.username: {}",payload.username), 0, state.clone());
 

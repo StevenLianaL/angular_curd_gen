@@ -6,11 +6,16 @@ edition = "2021"
 
 [dependencies]
 axum = "0.7.5"
-tokio = { version = "1.38.1", features = ["full"] }
+tokio = { version = "1.39.1", features = ["full"] }
 tower-http = { version = "0.5.2", features = ["auth", "cors", "timeout"] }
 tower = "0.4.13"
 http-body-util = "0.1.2"
 listenfd = "1.0.1"
+
+utoipa = { version = "5.0.0-alpha.0", features = ["axum_extras"] }
+utoipa-rapidoc = { version = "4.0.1-alpha.0", features = ["axum"] }
+utoipa-redoc = { version = "4.0.1-alpha.0", features = ["axum"] }
+
 
 config = "0.14.0"
 lazy_static = "1.5.0"
@@ -24,7 +29,7 @@ sea-orm = { version = "1.0.0-rc.7", features = ["sqlx-mysql", "runtime-async-std
 chrono = { version = "0.4.38", features = ["serde"] }
 chrono-tz = "0.9.0"
 
-redis = { version = "0.25.4", features = ["aio", "tokio-comp"] }
+redis = { version = "0.26.0", features = ["aio", "tokio-comp"] }
 bb8-redis = "0.15.0"
 
 

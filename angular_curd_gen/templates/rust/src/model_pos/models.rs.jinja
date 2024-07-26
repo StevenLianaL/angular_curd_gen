@@ -1,22 +1,23 @@
 {% set create_model = model_name+'Creatable' -%}
 {% set edit_model = model_name+'Editable' -%}
 use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct {{ model_name }}Creatable {
 {%- for field,field_type in model_create_fields_type_map.items() %}
     pub {{ field }}: {{ cls.map_rust_type(field_type) }},
 {%- endfor %}
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct {{ model_name }}Editable {
 {%- for field,field_type in model_edit_fields_type_map.items() %}
     pub {{ field }}: {{ cls.map_rust_type(field_type) }},
 {%- endfor %}
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, IntoParams)]
 pub(crate) struct {{ model_name }}Filter {
 {%- for field,field_type in list_filter_fields_type_map.items() %}
     pub {{ field }}: Option<{{ cls.map_rust_type(field_type) }}>,

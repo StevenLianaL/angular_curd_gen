@@ -13,6 +13,9 @@ use tower_http::timeout::TimeoutLayer;
 #[cfg(unix)]
 use tokio::signal::unix::{signal, SignalKind};
 use tokio::task;
+use utoipa::OpenApi;
+use utoipa_rapidoc::RapiDoc;
+use utoipa_redoc::{Redoc, Servable};
 
 
 pub mod demo;
@@ -57,6 +60,8 @@ pub async fn create_app() -> Router {
     let demo_routers_with_state = demo::routers::default::demo_routes().with_state(state.clone());
     let app = Router::new()
         .route("/", get(|| async { "Hello, W1111!" }))
+        .merge(RapiDoc::with_openapi("/api-docs/openapi2.json", utils::docs::ApiDoc::openapi()).path("/rapidoc"))
+        .merge(Redoc::with_url("/redoc", utils::docs::ApiDoc::openapi()))
         .nest("/auth", auth_routers_with_state)
         .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
