@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use serde_json::Value;
@@ -11,24 +10,35 @@ pub fn json_to_vec<T>(json_str: &str, _marker: T) -> Vec<T>
     serde_json::from_str(json_str).unwrap()
 }
 
-pub fn struct_to_hashmap<T>(item: &T) -> HashMap<String, String>
-    where
-        T: Serialize,
+pub fn struct_to_map<T, M>(item: &T, _marker: M) -> M
+where
+    T: Serialize,
+    M: Default + Extend<(String, String)>,
 {
     let json_value: Value = serde_json::to_value(item).unwrap();
+    let mut map =  M::default();
 
-    let map = json_value.as_object().unwrap();
+    if let Value::Object(obj) = json_value {
+        let pairs = obj.into_iter().map(|(key, value)| {
+            // 将 JSON 值转换为字符串
+            let value_str = match value {
+                Value::String(s) => s,
+                Value::Number(n) => n.to_string(),
+                Value::Bool(b) => b.to_string(),
+                _ => value.to_string(),
+            };
+            (key, value_str)
+        });
+        map.extend(pairs);
+    }
 
-    let pairs: HashMap<String, String> = map
-        .iter()
-        .map(|(key, value)| (key.clone(), value.to_string()))
-        .collect();
-
-    pairs
+    map
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+    use std::collections::HashMap;
     use super::*;
 
     #[derive(Serialize, Debug)]
@@ -44,10 +54,13 @@ mod tests {
             age: 18,
         };
 
-        let kv_pairs = struct_to_hashmap(&test_struct);
+        let hash_kv_pairs = struct_to_map(&test_struct, HashMap::new());
 
-        assert_eq!(kv_pairs.len(), 2);
-        assert_eq!(kv_pairs.get("name").unwrap(), "\"test\"");
+        assert_eq!(hash_kv_pairs.len(), 2);
+        assert_eq!(hash_kv_pairs.get("name").unwrap(), "test");
+
+        let btree_kv_pairs = struct_to_map(&test_struct, BTreeMap::new());
+        assert_eq!(btree_kv_pairs.len(), 2);
     }
 
     #[test]
