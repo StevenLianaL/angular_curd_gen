@@ -55,7 +55,7 @@ async fn get_by_redis(state: State<state::AppState>, Query(params): Query<models
 #[utoipa::path(
     post,
     path = "/redis/demo",
-    request_body = RedisKeyValue,
+    request_body = models::RedisKeyValue,
     responses(
     (status = 201, description = "set redis key success", body = String),
     )

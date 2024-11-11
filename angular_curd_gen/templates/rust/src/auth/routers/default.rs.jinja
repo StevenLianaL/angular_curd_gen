@@ -28,9 +28,9 @@ pub fn auth_routes() -> Router<state::AppState> {
 #[utoipa::path(
     post,
     path = "/login",
-    request_body = LoginRequest,
+    request_body = models::LoginRequest,
     responses(
-    (status = 200, description = "login success", body = LoginResponse),
+    (status = 200, description = "login success", body = models::LoginRequest),
     (status = 400, description = "UserNotFound or PasswordError"),
     )
 )]

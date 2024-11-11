@@ -33,7 +33,7 @@ pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
         ("jwt" = String, Header, description = "jwt token"),
     ),
     responses(
-        (status = 200, description = "查询{{ model_name }}列表", body = [Model]),
+        (status = 200, description = "查询{{ model_name }}列表", body = [{{ lower_model_name }}::Model]),
     )
 )]
 async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter): Query<models::{{ model_name }}Filter>) -> Response {
@@ -76,12 +76,12 @@ async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower
 #[utoipa::path(
     post,
     path = "/{{ lower_models_name }}",
-    request_body = {{ model_name }}Creatable,
+    request_body = models::{{ model_name }}Creatable,
     params(
         ("jwt" = String, Header, description = "jwt token"),
     ),
     responses(
-    (status = 201, description = "创建{{ model_name }}成功", body = Model),
+    (status = 201, description = "创建{{ model_name }}成功", body = {{ lower_model_name }}::Model),
     )
 )]
 async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(payload): Json<models::{{ model_name }}Creatable>) -> Response {
@@ -100,13 +100,13 @@ async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(paylo
 #[utoipa::path(
     put,
     path = "/{{ lower_models_name }}/{{ single_left }}{{ lower_model_name }}_id}",
-    request_body = {{ model_name }}Editable,
+    request_body = models::{{ model_name }}Editable,
     params(
         ("{{ lower_model_name }}_id" = i64, Path, description = "{{ model_name }} id"),
         ("jwt" = String, Header, description = "jwt token"),
     ),
     responses(
-    (status = 200, description = "更新{{ model_name }}成功", body = Model),
+    (status = 200, description = "更新{{ model_name }}成功", body = {{ lower_model_name }}::Model),
     ),
 )]
 async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<models::{{ model_name }}Editable>) -> impl IntoResponse {
