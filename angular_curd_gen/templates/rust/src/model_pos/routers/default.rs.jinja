@@ -1,6 +1,6 @@
 {% set single_left = '{' -%}
 use axum::extract::{Path, Query, State};
-use axum::{Json, Router};
+use axum::{Extension, Json, Router};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get};
@@ -22,7 +22,7 @@ pub struct {{ model_name }}Api;
 pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
     Router::new()
         .route("/{{ lower_models_name }}", get(get_{{ lower_models_name }}).post(create_{{ lower_model_name }}))
-        .route("/{{ lower_models_name }}/:{{ lower_model_name }}_id", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
+        .route("/{{ lower_models_name }}/{{ single_left }}{{ lower_model_name }}_id}", get(get_{{ lower_model_name }}).put(update_{{ lower_model_name }}).delete(delete_{{ lower_model_name }}))
 }
 
 #[utoipa::path(
@@ -36,8 +36,8 @@ pub fn {{ lower_model_name }}_routes() -> Router<state::AppState> {
         (status = 200, description = "查询{{ model_name }}列表", body = [{{ lower_model_name }}::Model]),
     )
 )]
-async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter): Query<models::{{ model_name }}Filter>) -> Response {
-    info!(&format!("filter: {filter:?}"), 0, state.clone());
+async fn get_{{ lower_models_name }}(state: State<state::AppState>, Extension(user_id): Extension<i64>, Query(filter): Query<models::{{ model_name }}Filter>) -> Response {
+    info!(&format!("filter: {filter:?}"), user_id, state.clone());
 
     let mut query = {{ model_name }}::find();
 
@@ -66,8 +66,8 @@ async fn get_{{ lower_models_name }}(state: State<state::AppState>, Query(filter
         ("jwt" = String, Header, description = "jwt token"),
     ),
 )]
-async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> Response {
-    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
+async fn get_{{ lower_model_name }}(state: State<state::AppState>, Extension(user_id): Extension<i64>, Path({{ lower_model_name }}_id): Path<i64>) -> Response {
+    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), user_id, state.clone());
 
     let {{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*state.conn).await.unwrap().unwrap();
     (StatusCode::OK, Json({{ lower_model_name }})).into_response()
@@ -84,8 +84,8 @@ async fn get_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower
     (status = 201, description = "创建{{ model_name }}成功", body = {{ lower_model_name }}::Model),
     )
 )]
-async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(payload): Json<models::{{ model_name }}Creatable>) -> Response {
-    info!(&format!("payload: {payload:?}"), 0, state.clone());
+async fn create_{{ lower_model_name }}(state: State<state::AppState>, Extension(user_id): Extension<i64>, Json(payload): Json<models::{{ model_name }}Creatable>) -> Response {
+    info!(&format!("payload: {payload:?}"), user_id, state.clone());
 
     let new_{{ lower_model_name }} = {{ lower_model_name }}::ActiveModel {
     {%- for field,field_type in model_create_fields_type_map.items() %}
@@ -109,8 +109,8 @@ async fn create_{{ lower_model_name }}(state: State<state::AppState>, Json(paylo
     (status = 200, description = "更新{{ model_name }}成功", body = {{ lower_model_name }}::Model),
     ),
 )]
-async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<models::{{ model_name }}Editable>) -> impl IntoResponse {
-    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}, payload: {payload:?}"), 0, state.clone());
+async fn update_{{ lower_model_name }}(state: State<state::AppState>, Extension(user_id): Extension<i64>, Path({{ lower_model_name }}_id): Path<i64>, Json(payload): Json<models::{{ model_name }}Editable>) -> impl IntoResponse {
+    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}, payload: {payload:?}"), user_id, state.clone());
 
     let raw_{{ lower_model_name }}: {{ lower_model_name }}::Model = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*state.conn).await.unwrap().unwrap();
     let mut {{ lower_model_name }}: {{ lower_model_name }}::ActiveModel = raw_{{ lower_model_name }}.into();
@@ -132,8 +132,8 @@ async fn update_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lo
         (status = 204, description = "delete success"),
     ),
 )]
-async fn delete_{{ lower_model_name }}(state: State<state::AppState>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
-    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), 0, state.clone());
+async fn delete_{{ lower_model_name }}(state: State<state::AppState>, Extension(user_id): Extension<i64>, Path({{ lower_model_name }}_id): Path<i64>) -> impl IntoResponse {
+    info!(&format!("{{ lower_model_name }}_id: {{ single_left }}{{ lower_model_name }}_id}"), user_id, state.clone());
 
     let {{ lower_model_name }} = {{ model_name }}::find_by_id({{ lower_model_name }}_id).one(&*state.conn).await.unwrap();
     if let Some({{ lower_model_name }}) = {{ lower_model_name }} {

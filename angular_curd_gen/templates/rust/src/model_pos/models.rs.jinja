@@ -18,7 +18,7 @@ pub struct {{ model_name }}Editable {
 }
 
 #[derive(Debug, Serialize, Deserialize, IntoParams)]
-pub(crate) struct {{ model_name }}Filter {
+pub struct {{ model_name }}Filter {
 {%- for field,field_type in list_filter_fields_type_map.items() %}
     pub {{ field }}: Option<{{ cls.map_rust_type(field_type) }}>,
 {%- endfor %}

@@ -7,12 +7,12 @@ use crate::{{ lower_model_name }}::routers::default::{{ model_name }}Api;
     nest(
         (path = "/auth", api = AuthApi, tags = ["auth"]),
         (path = "/demo", api = DemoApi, tags = ["demo"]),
-        (path = "/{{ app_name }}", api = {{ model_name }}Api, tags = ["{{ lower_model_name }}"]),
+        (path = "/{{ lower_app_name }}", api = {{ model_name }}Api, tags = ["{{ lower_model_name }}"]),
     ),
     tags(
         (name = "auth", description = "The auth Operations"),
         (name = "demo", description = "The demo Operations"),
-        (name = "{{ app_name }}", description = "The {{ app_name }} Operations"),
+        (name = "{{ lower_app_name }}", description = "The {{ app_name }} Operations"),
     )
 )]
 pub struct ApiDoc;

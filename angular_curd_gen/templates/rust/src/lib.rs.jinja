@@ -24,7 +24,7 @@ pub mod {{ lower_model_name }};
 pub mod utils;
 pub mod config;
 
-use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL, SETTINGS};
+use crate::config::{DATABASE_URL, MONGO_URL, REDIS_URL};
 
 use utils::state;
 
@@ -51,7 +51,7 @@ pub async fn build_state() -> state::AppState {
 }
 
 pub async fn create_app() -> Router {
-    println!("{:#?}", *SETTINGS);
+    // println!("{:#?}", *SETTINGS);
 
     let state = build_state().await;
 
@@ -63,7 +63,7 @@ pub async fn create_app() -> Router {
         .merge(RapiDoc::with_openapi("/api-docs/openapi2.json", utils::docs::ApiDoc::openapi()).path("/rapidoc"))
         .merge(Redoc::with_url("/redoc", utils::docs::ApiDoc::openapi()))
         .nest("/auth", auth_routers_with_state)
-        .nest("/{{ app_name }}", {{ lower_model_name }}_routers_with_state)
+        .nest("/{{ lower_app_name }}", {{ lower_model_name }}_routers_with_state)
         .nest("/demo", demo_routers_with_state)
         .route_layer(middleware::from_fn_with_state(state.clone(), auth::middlewares::jwt_auth))
         .route_layer(middleware::from_fn_with_state(state.clone(), auth::middlewares::log_req_access_times))

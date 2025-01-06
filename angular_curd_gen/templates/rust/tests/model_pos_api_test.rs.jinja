@@ -2,14 +2,14 @@ use axum::{
     http::StatusCode,
 };
 use http_body_util::BodyExt;
-use {{ app_name }}::auth::utils::JwtManager;
-use {{ app_name }}::utils::test::{delete_response, get_response, post_response, put_response};
+use {{ lower_app_name }}::auth::utils::JwtManager;
+use {{ lower_app_name }}::utils::test::{delete_response, get_response, post_response, put_response};
 
 
 #[tokio::test]
 async fn test_get_{{ lower_models_name }}() {
     let token = JwtManager::gen_token(1);
-    let response = get_response("/{{ app_name }}/{{ lower_models_name }}", "".to_string(), token).await;
+    let response = get_response("/{{ lower_app_name }}/{{ lower_models_name }}", "".to_string(), token).await;
     assert_eq!(response.status(), StatusCode::OK);
     let body = response.into_body().collect().await.unwrap().to_bytes();
     assert!(!body.is_empty());
@@ -33,14 +33,14 @@ async fn test_create_{{ lower_model_name }}() {
     {%- endfor -%}
     }
     );
-    let response = post_response("/{{ app_name }}/{{ lower_models_name }}", json.to_string(), token.clone()).await;
+    let response = post_response("/{{ lower_app_name }}/{{ lower_models_name }}", json.to_string(), token.clone()).await;
     assert_eq!(response.status(), StatusCode::CREATED);
 }
 
 #[tokio::test]
 async fn test_get_{{ lower_model_name }}() {
     let token = JwtManager::gen_token(1);
-    let response = get_response("/{{ app_name }}/{{ lower_models_name }}/{{ db_first_id }}", "".to_string(), token).await;
+    let response = get_response("/{{ lower_app_name }}/{{ lower_models_name }}/{{ db_first_id }}", "".to_string(), token).await;
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -61,13 +61,13 @@ async fn test_update_{{ lower_model_name }}() {
     {%- endfor -%}
     }
     );
-    let response = put_response("/{{ app_name }}/{{ lower_models_name }}/{{ db_first_id }}", json.to_string(), token.clone()).await;
+    let response = put_response("/{{ lower_app_name }}/{{ lower_models_name }}/{{ db_first_id }}", json.to_string(), token.clone()).await;
     assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
 async fn test_delete_{{ lower_model_name }}() {
     let token = JwtManager::gen_token(1);
-    let response = delete_response("/{{ app_name }}/{{ lower_models_name }}/{{ db_last_id }}", "".to_string(), token).await;
+    let response = delete_response("/{{ lower_app_name }}/{{ lower_models_name }}/{{ db_last_id }}", "".to_string(), token).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }

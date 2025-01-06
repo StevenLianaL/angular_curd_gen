@@ -12,8 +12,8 @@ class GameInfo(BaseModel):
     link: Url
     game_title: str
     cover: Image
-    user_views: int = None
-    created: datetime = None
+    user_views: int
+    created: datetime
 
 
 class GameInfoAdmin:
@@ -27,6 +27,58 @@ class GameInfoAdmin:
     model_edit_fields = ('link', 'game_title', 'user_views')
     model_create_fields = model_edit_fields
     model_translate_fields = ('ID', '游戏链接', '游戏名称', '游戏封面', '浏览次数')
+
+
+class Client(BaseModel):
+    id: int
+    name: str
+
+
+class ClientAdmin:
+    """游戏信息管理注释文档信息"""
+    model_readable_name = '客户端'
+    model_fields = ('id', 'name')
+    list_display_restraint = ('id', 'name')
+    list_editable_restraint = ('id', 'name')
+    list_filter_fields = ('name',)
+    list_sort_fields = ('name',)
+    model_edit_fields = ('name',)
+    model_create_fields = ('name',)
+    model_translate_fields = ('ID', '名称')
+
+
+# create table papers
+# (
+#     name        varchar(100)                          not null,
+#     grade       varchar(2)                            not null,
+#     id          int auto_increment
+#         primary key,
+#     test_type   varchar(20) default ''                null,
+#     sections    varchar(30)                           null,
+#     instruction varchar(1000)                         null,
+#     created     datetime    default CURRENT_TIMESTAMP not null
+# )
+class Paper(BaseModel):
+    id: int
+    name: str
+    grade: str
+    parent_id: int
+    version: int
+    test_type: str = ""
+    created: datetime
+
+
+class PapersAdmin:
+    """试卷管理注释文档信息"""
+    model_readable_name = '试卷'
+    model_fields = ('id', 'name', 'grade', 'test_type', 'created', 'parent_id', 'version')
+    list_display_restraint = ('id', 'name', 'grade', 'test_type', 'version', 'created')
+    list_editable_restraint = ('name', 'grade', 'test_type')
+    list_filter_fields = ('name', 'grade', 'test_type')
+    list_sort_fields = ('created',)
+    model_edit_fields = ('name', 'grade')
+    model_create_fields = ('name', 'grade',)
+    model_translate_fields = ('ID', '名称', '年级', '试卷类型', '创建时间', '父卷ID', '版本')
 
 
 class Video(BaseModel):
@@ -59,6 +111,27 @@ class VideosAdmin:
                               '分类', '节', '年级', '学科覆盖', '领域', '来源')
 
 
+class Product(BaseModel):
+    id: int
+    name: str
+    price: float
+    detail: str
+    version: str
+    created: datetime
+
+
+class ProductsAdmin:
+    model_readable_name = '产品'
+    model_fields = ('id', 'name', 'price', 'detail', 'version', 'created')
+    list_display_restraint = ('id', 'name', 'price', 'detail', 'version', 'created')
+    list_editable_restraint = ()
+    list_filter_fields = ('name', 'price', 'version')
+    list_sort_fields = ('price', 'created')
+    model_edit_fields = ('name', 'price', 'detail', 'version')
+    model_create_fields = ('name', 'price', 'detail', 'version')
+    model_translate_fields = ('ID', '名称', '价格', '详情', '版本', '创建时间')
+
+
 class Trades(BaseModel):
     id: int
     self_trade_no: str
@@ -86,6 +159,44 @@ class TradesAdmin:
         'ID', '交易号', '外部交易号', '商品名称', '商品ID', '用户ID', '价格', '是否支付', '支付方式', '创建时间')
 
 
+class Item(BaseModel):
+    id: int
+    item_text: str
+    choices: str
+    item_key: str = ""
+    item_type: str
+    grade: str
+    test_type: int
+    source: str
+    status: int
+    author_id: int
+    created: datetime
+    parent_id: int
+    version: int
+
+
+class ItemsAdmin:
+    model_readable_name = '试题'
+    model_fields = (
+        'id', 'item_text', 'choices', 'item_key', 'item_type',
+        'grade', 'test_type', 'source', 'status', 'author_id',
+        'created', 'parent_id', 'version'
+    )
+    list_display_restraint = (
+        'id', 'item_text', 'choices', 'item_key', 'item_type',
+        'grade', 'test_type', 'source', 'created'
+    )
+    list_editable_restraint = ()
+    list_filter_fields = ('item_text', 'grade', 'test_type')
+    list_sort_fields = ('created', 'grade', 'test_type')
+    model_edit_fields = ('item_text', 'choices', 'item_key', 'item_type', 'grade', 'status')
+    model_create_fields = ('item_text', 'choices', 'item_key', 'item_type', 'grade', 'test_type')
+    model_translate_fields = (
+        'ID', '题目文本', '选项', '题目标识', '题目类型', '年级',
+        '测试类型', '来源', '状态', '作者ID', '创建时间', '父题ID', '版本'
+    )
+
+
 def test_register_game():
     generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
                        db_name='game_search', db_user='test', db_pswd='test')
@@ -97,5 +208,13 @@ def test_register():
 
     # generate_whole_app(model_admin=VideosAdmin, model=Video, app_name='health_videos', app_readable_name='视频平台',
     #                    db_name='health_videos', db_user='test', db_pswd='test')
-    generate_whole_app(model_admin=TradesAdmin, model=Trades, app_name='auto_tasks', app_readable_name='自动任务',
-                       db_name='transactions', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=TradesAdmin, model=Trades, app_name='transactions', app_readable_name='交易',
+    #                    db_name='transactions', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=TradesAdmin, model=Trades, app_name='pay', app_readable_name='交易',
+    #                    db_name='transactions', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=ProductsAdmin, model=Product, app_name='transactions', app_readable_name='产品',
+    #                    db_name='transactions', db_user='test', db_pswd='test')
+    generate_whole_app(model_admin=PapersAdmin, model=Paper, app_name='paper', app_readable_name='试卷',
+                       db_name='yass', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=ItemsAdmin, model=Item, app_name='Item', app_readable_name='试卷',
+    #                    db_name='yass', db_user='test', db_pswd='test')

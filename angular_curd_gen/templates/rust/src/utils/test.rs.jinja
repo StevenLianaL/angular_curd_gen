@@ -3,7 +3,7 @@ use axum::{
     http::Request,
     response::Response,
 };
-use tower::ServiceExt;
+use tower::util::ServiceExt;
 use crate::create_app;
 
 pub async fn post_response(url: &str, req_body: String, token: String) -> Response<Body> {

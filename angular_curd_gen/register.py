@@ -19,6 +19,7 @@ class ModelRegister:
 
     app_name: str = ''  # app name run in code
     app_readable_name: str = ''  # show in page
+    lower_app_name: str = ''
     app_title_name = ''
 
     db_name: str = 'test'
@@ -56,6 +57,7 @@ class ModelRegister:
         # model_pos
 
         self.app_title_name = self.app_name.title()
+        self.lower_app_name = FieldUtil.camel_to_snake(self.app_name)
 
         self.model_name = FieldUtil.to_singular(self.model.__name__)
         self.models_name = FieldUtil.to_plural(self.model_name)
@@ -238,6 +240,7 @@ class ModelRegister:
     def _build_context(self) -> dict:
         base_context = {
             'app_name': self.app_name,
+            'lower_app_name': self.lower_app_name,
             'app_readable_name': self.app_readable_name,
             'app_title_name': self.app_title_name,
             'model_name': self.model_name,
@@ -279,8 +282,8 @@ class ModelRegister:
 
     def _to_test_folder(self):
         """Copy all files to test folder"""
-        shutil.copytree(str(self.output_angular_dir), "W:/projects/work/iwp-frontend/src/app/items", dirs_exist_ok=True)
-        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/iwp_backend", dirs_exist_ok=True)
+        shutil.copytree(str(self.output_angular_dir), "W:/projects/work/test-frontend/src/app/paper", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/test_backend", dirs_exist_ok=True)
 
 
 @dataclass
@@ -344,7 +347,10 @@ class RustModelRegister(ModelRegister):
 
 def generate_whole_app(app_name: str, app_readable_name: str, model: BaseModel, model_admin: ModelAdmin,
                        db_name: str = 'test', db_user: str = 'test', db_pswd: str = 'test'):
-    """generate whole app"""
+    """
+    generate whole app
+    app_name: lower case
+    """
     amr = AngularModelRegister(model_admin=model_admin, model=model, app_name=app_name,
                                app_readable_name=app_readable_name, db_name=db_name, db_user=db_user, db_pswd=db_pswd)
     amr.register()
