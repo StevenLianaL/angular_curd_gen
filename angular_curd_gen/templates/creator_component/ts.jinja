@@ -8,6 +8,8 @@ import {NzMessageService} from "ng-zorro-antd/message";
 import dayjs from "dayjs";
 
 import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
+import {SHARED_BASE_IMPORTS} from '../../../../shared/base';
+import {SHARED_FORM_IMPORTS} from '../../../../shared/form';
 
 
 
@@ -16,6 +18,9 @@ import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
   templateUrl: './{{ lower_model_name }}-creator.component.html',
   styleUrls: ['./{{ lower_model_name }}-creator.component.css'],
   standalone: true,
+  imports: [
+    SHARED_BASE_IMPORTS, SHARED_FORM_IMPORTS
+  ]
 })
 export class {{ component_name }} implements OnInit {
 
@@ -31,7 +36,7 @@ export class {{ component_name }} implements OnInit {
   initBaseForm(): void {
     this.{{ new_form_name }} = this.fb.group({
         {% for form_field in model_create_fields -%}
-            {{ form_field }}: [null, [Validators.required]],
+            {{ form_field | to_lower_camel }}: [null, [Validators.required]],
         {% endfor -%}
     });
   }
@@ -44,7 +49,7 @@ export class {{ component_name }} implements OnInit {
     this.{{ new_form_name }}.patchValue({
         {% for form_field, form_field_type in model_create_fields_type_map.items() -%}
             {%- if cls.extract_py_type(form_field_type)=='datetime.date' -%}
-                {{ form_field }}: dayjs(this.{{ new_form_name }}.value.{{ form_field }}).format('YYYY-MM-DD'),
+                {{ form_field | to_lower_camel }}: dayjs(this.{{ new_form_name }}.value.{{ form_field | to_lower_camel }}).format('YYYY-MM-DD'),
             {%- endif %}
         {%- endfor %}
     });

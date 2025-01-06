@@ -12,13 +12,17 @@ import dayjs from "dayjs";
 
 import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
 import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
-
+import {SHARED_BASE_IMPORTS} from '../../../../shared/base';
+import {SHARED_FORM_IMPORTS} from '../../../../shared/form';
 
 @Component({
   selector: 'app-{{ lower_model_name }}-updater',
   templateUrl: './{{ lower_model_name }}-updater.component.html',
   styleUrls: ['./{{ lower_model_name }}-updater.component.css'],
   standalone: true,
+  imports: [
+    SHARED_BASE_IMPORTS, SHARED_FORM_IMPORTS
+  ]
 })
 export class {{ component_name }} implements OnInit {
 
@@ -39,7 +43,7 @@ export class {{ component_name }} implements OnInit {
   initBaseForm({{ lower_model_name }}: {{ model_name }}): void {
     this.{{ update_form_name }} = this.fb.group({
         {% for form_field in model_edit_fields -%}
-            {{ form_field }}: [{{ lower_model_name }}.{{ form_field }}, [Validators.required]],
+            {{ form_field | to_lower_camel }}: [{{ lower_model_name }}.{{ form_field | to_lower_camel }}, [Validators.required]],
         {% endfor -%}
     });
   }

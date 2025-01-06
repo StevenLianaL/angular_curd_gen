@@ -11,7 +11,7 @@ import { {{ dashboard_component_name }}} from "./{{ lower_app_name }}-dashboard/
 
 export const {{ model_name }}Routes: Routes = [
   {path: '', component: {{ dashboard_component_name }}},
-  {path: '{{ lower_models_name }}', component: {{ list_component_name }}},
-  {path: '{{ lower_models_name }}/creator', component: {{ creator_component_name }}},
-  {path: '{{ lower_models_name }}/:{{ lower_model_camel_name }}Id/updater', component: {{ updater_component_name }}},
+  {path: '', component: {{ list_component_name }}},
+  {path: 'creator', component: {{ creator_component_name }}},
+  {path: ':{{ lower_model_camel_name }}Id/updater', component: {{ updater_component_name }}},
 ];

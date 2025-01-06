@@ -12,6 +12,7 @@ pub struct Model {
 {%- for field,field_type in model_fields_type_map.items() %}
     {% set rust_field_type = cls.map_rust_type(field_type) -%}
     {% if rust_field_type == "DateTime" -%}
+    #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     #[schema(value_type = String, format = Date)]
     {% endif -%}
     pub {{ field }}: {{ rust_field_type }}{% if not loop.last %},{% endif %}

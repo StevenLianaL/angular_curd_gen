@@ -6,12 +6,18 @@ import {NzMessageService} from "ng-zorro-antd/message";
 
 import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
 import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
+import {SHARED_BASE_IMPORTS} from '../../../../shared/base';
+import {SHARE_TABLE_IMPORTS} from '../../../../shared/table';
+import {SHARED_FORM_IMPORTS} from '../../../../shared/form';
 
 @Component({
   selector: 'app-{{ lower_model_name }}-list',
   templateUrl: './{{ lower_model_name }}-list.component.html',
   styleUrls: ['./{{ lower_model_name }}-list.component.css'],
   standalone: true,
+  imports: [
+    SHARED_BASE_IMPORTS, SHARE_TABLE_IMPORTS, SHARED_FORM_IMPORTS
+  ]
 })
 export class {{ model_name }}ListComponent implements OnInit {
   {{ models_list_var }}: {{ model_name }}[] = [];
@@ -65,7 +71,7 @@ export class {{ model_name }}ListComponent implements OnInit {
   {% for field in list_sort_fields %}
   // @ts-ignore
   sort{{ model_name }}{{ field|to_camel }}(a, b) {
-      return a.{{ field }} - b.{{ field }}
+      return a.{{ field | to_lower_camel }} - b.{{ field | to_lower_camel }}
   }
   {% endfor %}
 }

@@ -11,10 +11,10 @@
         <nz-col class="center-content">
             <nz-breadcrumb>
                 <nz-breadcrumb-item routerLink="/">首页</nz-breadcrumb-item>
-                <nz-breadcrumb-item routerLink="/{{ app_name }}">
+                <nz-breadcrumb-item routerLink="/{{ lower_models_name }}">
                     <a>{{ app_readable_name }}</a>
                 </nz-breadcrumb-item>
-                <nz-breadcrumb-item routerLink="/{{ app_name }}/{{ lower_models_name }}">
+                <nz-breadcrumb-item routerLink="/{{ lower_models_name }}">
                     <a>{{ model_readable_name }}列表</a>
                 </nz-breadcrumb-item>
             </nz-breadcrumb>
@@ -27,7 +27,7 @@
             <nz-statistic [nzValue]="{{ models_name }}List.length" [nzTitle]="'{{ model_readable_name }}数量'"></nz-statistic>
           </nz-col>
           <nz-col nzSpan="3" class="center-content">
-            <a nz-button nzType="primary" nzShape="round" nzSize="large" routerLink="/{{ app_name }}/{{ lower_models_name }}/creator">添加{{ model_readable_name }}</a>
+            <a nz-button nzType="primary" nzShape="round" nzSize="large" routerLink="/{{ lower_models_name }}/creator">添加{{ model_readable_name }}</a>
           </nz-col>
         </nz-row>
       </div>
@@ -58,7 +58,7 @@
         <tr *ngFor="let data of {{ table_name }}.data">
             {% for ldf,ldf_type in list_display_restraint_type_map.items() -%}
                 {%- if cls.extract_py_type(ldf_type)=='bool' -%}
-                <td [ngSwitch]="data.{{ ldf }}">
+                <td [ngSwitch]="data.{{ ldf | to_lower_camel }}">
                   <span *ngSwitchCase="true" nz-icon nzType="check-circle" nzTheme="twotone"></span>
                   <span *ngSwitchCase="false" nz-icon nzType="close-circle" nzTheme="twotone" [twoToneColor]="'red'"></span>
                 </td>
@@ -67,18 +67,18 @@
                     nz-image
                     width="200px"
                     height="200px"
-                    [nzSrc]="data.{{ ldf }}"
+                    [nzSrc]="data.{{ ldf | to_lower_camel }}"
                     alt=""/>
                 </td>
                 {%- elif cls.extract_py_type(ldf_type)=='Url' -%}
-                <td><a [href]="data.{{ ldf }}">{{ left }}data.{{ ldf }}{{ right }}</a></td>
+                <td><a [href]="data.{{ ldf | to_lower_camel }}">{{ left }}data.{{ ldf | to_lower_camel }}{{ right }}</a></td>
                 {%- else -%}
-                    <td>{{ left }}data.{{ ldf }}{{ right }}</td>
+                    <td>{{ left }}data.{{ ldf | to_lower_camel }}{{ right }}</td>
                 {%- endif %}
             {% endfor -%}
             <td>
                 <nz-space>
-                  <a nz-button *nzSpaceItem nzShape="round" routerLink="/{{ app_name }}/{{ lower_models_name }}/{{left}} data.id {{ right }}/updater">更新</a>
+                  <a nz-button *nzSpaceItem nzShape="round" routerLink="/{{ lower_models_name }}/{{left}} data.id {{ right }}/updater">更新</a>
                   <button nz-button *nzSpaceItem nzType="primary" nzShape="round" nzDanger
                           nz-popconfirm
                           nzPopconfirmTitle="确定删除{{ model_readable_name }}吗?"
