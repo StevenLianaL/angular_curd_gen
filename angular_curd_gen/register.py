@@ -170,7 +170,7 @@ class ModelRegister:
                     father_dir = self.output_angular_dir / self.lower_model_name / target_prefix
                     target_dir = f"{self.lower_model_name}/{target_prefix}"
                 case 'app':
-                    target_prefix = f"{self.app_name}-{component_name}"
+                    target_prefix = f"{self.lower_app_name}-{component_name}"
                     father_dir = self.output_angular_dir / target_prefix
                     target_dir = f"{target_prefix}"
                 case _:
@@ -305,14 +305,9 @@ class AngularModelRegister(ModelRegister):
         target = f"{self.lower_model_name}/{self.lower_model_name}_api.service.spec.ts"
         self._draw_template(template_name=template, target=target, project='angular')
 
-    def gen_c_module(self):
-        template = 'module.jinja'
-        target = f"{self.app_name}.module.ts"
-        self._draw_template(template_name=template, target=target, project='angular')
-
     def gen_d_router(self):
         template = 'routers.jinja'
-        target = f"{self.app_name}-routing.module.ts"
+        target = f"{self.lower_model_name}.routes.ts"
         self._draw_template(template_name=template, target=target, project='angular')
 
     def gen_e_app_components(self):

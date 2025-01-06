@@ -14,7 +14,8 @@ import { {{ service_name }}} from '../{{ lower_model_name }}_api.service';
 @Component({
   selector: 'app-{{ lower_model_name }}-creator',
   templateUrl: './{{ lower_model_name }}-creator.component.html',
-  styleUrls: ['./{{ lower_model_name }}-creator.component.css']
+  styleUrls: ['./{{ lower_model_name }}-creator.component.css'],
+  standalone: true,
 })
 export class {{ component_name }} implements OnInit {
 

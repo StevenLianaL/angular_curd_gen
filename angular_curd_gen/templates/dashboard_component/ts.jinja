@@ -3,9 +3,10 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'app-{{ app_name }}-dashboard',
-  templateUrl: './{{ app_name }}-dashboard.component.html',
-  styleUrls: ['./{{ app_name }}-dashboard.component.css']
+  selector: 'app-{{ lower_app_name }}-dashboard',
+  templateUrl: './{{ lower_app_name }}-dashboard.component.html',
+  styleUrls: ['./{{ lower_app_name }}-dashboard.component.css'],
+  standalone: true,
 })
 export class {{ component_name }} implements OnInit {
   models = ['{{ lower_models_name }}']

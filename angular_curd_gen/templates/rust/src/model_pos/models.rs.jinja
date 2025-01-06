@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct {{ model_name }}Creatable {
 {%- for field,field_type in model_create_fields_type_map.items() %}
     pub {{ field }}: {{ cls.map_rust_type(field_type) }},
@@ -11,6 +12,7 @@ pub struct {{ model_name }}Creatable {
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct {{ model_name }}Editable {
 {%- for field,field_type in model_edit_fields_type_map.items() %}
     pub {{ field }}: {{ cls.map_rust_type(field_type) }},
@@ -18,6 +20,7 @@ pub struct {{ model_name }}Editable {
 }
 
 #[derive(Debug, Serialize, Deserialize, IntoParams)]
+#[serde(rename_all = "camelCase")]
 pub struct {{ model_name }}Filter {
 {%- for field,field_type in list_filter_fields_type_map.items() %}
     pub {{ field }}: Option<{{ cls.map_rust_type(field_type) }}>,

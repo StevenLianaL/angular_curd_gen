@@ -3,7 +3,7 @@
 {% if model_fields_type_map -%}
 export interface {{ model_name }} {
 {%- for field,field_type in model_fields_type_map.items() %}
-    {{ field }}: {{ cls.map_ts_type(field_type) }}{% if not loop.last %},{% endif %}
+    {{ field | to_lower_camel }}: {{ cls.map_ts_type(field_type) }}{% if not loop.last %},{% endif %}
 {%- endfor %}
 }
 {% endif %}
@@ -11,7 +11,7 @@ export interface {{ model_name }} {
 {% if model_edit_fields_type_map -%}
 export interface {{ edit_model }} {
 {%- for field,field_type in model_edit_fields_type_map.items() %}
-    {{ field }}: {{ cls.map_ts_type(field_type) }}{% if not loop.last %},{% endif %}
+    {{ field | to_lower_camel }}: {{ cls.map_ts_type(field_type) }}{% if not loop.last %},{% endif %}
 {%- endfor %}
 }
 {% endif %}
@@ -19,7 +19,7 @@ export interface {{ edit_model }} {
 {% if model_create_fields_type_map -%}
 export interface {{ create_model }} {
 {%- for field,field_type in model_create_fields_type_map.items() %}
-    {{ field }}: {{ cls.map_ts_type(field_type) }}{% if not loop.last %},{% endif %}
+    {{ field | to_lower_camel }}: {{ cls.map_ts_type(field_type) }}{% if not loop.last %},{% endif %}
 {%- endfor %}
 }
 {% endif %}

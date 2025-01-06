@@ -17,7 +17,8 @@ import { {{ model_name }} } from '../{{ lower_model_name }}_interfaces';
 @Component({
   selector: 'app-{{ lower_model_name }}-updater',
   templateUrl: './{{ lower_model_name }}-updater.component.html',
-  styleUrls: ['./{{ lower_model_name }}-updater.component.css']
+  styleUrls: ['./{{ lower_model_name }}-updater.component.css'],
+  standalone: true,
 })
 export class {{ component_name }} implements OnInit {
 
