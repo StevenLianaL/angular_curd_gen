@@ -6,38 +6,38 @@ edition = "2021"
 
 [dependencies]
 axum = "0.8.1"
-tokio = { version = "1.41.2", features = ["full"] }
+tokio = { version = "1.44.1", features = ["full"] }
 tower-http = { version = "0.6.2", features = ["auth", "cors", "timeout"] }
 tower = { version = "0.5.2", features = ["util"] }
-http-body-util = "0.1.2"
+http-body-util = "0.1.3"
 listenfd = "1.0.1"
 
 utoipa = { version = "5.3.1", features = ["axum_extras"] }
-utoipa-rapidoc = { version = "5.0.1", features = ["axum"] }
-utoipa-redoc = { version = "5.0.1", features = ["axum"] }
+utoipa-rapidoc = { version = "6.0.0", features = ["axum"] }
+utoipa-redoc = { version = "6.0.0", features = ["axum"] }
 
 
 config = "0.14.1"
 lazy_static = "1.5.0"
-serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.134"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
 
-thiserror = "2.0.9"
-anyhow = "1.0.95"
+thiserror = "2.0.12"
+anyhow = "1.0.97"
 
-sea-orm = { version = "1.1.1", features = ["sqlx-mysql", "runtime-async-std-native-tls", "macros"] }
-chrono = { version = "0.4.39", features = ["serde"] }
-chrono-tz = "0.10.0"
+sea-orm = { version = "1.1.7", features = ["sqlx-mysql", "runtime-async-std-native-tls", "macros"] }
+chrono = { version = "0.4.40", features = ["serde"] }
+chrono-tz = "0.10.1"
 
-redis = { version = "0.27.5", features = ["aio", "tokio-comp"] }
-bb8-redis = "0.18.0"
+redis = { version = "0.29.1", features = ["aio", "tokio-comp"] }
+bb8-redis = "0.21.0"
 
 
-bson = "2.13.0"
-mongodb = "3.1.0"
+bson = "2.14.0"
+mongodb = "3.2.2"
 
-bcrypt = "0.16.0"
-jsonwebtoken = "9.3.0"
+bcrypt = "0.17.0"
+jsonwebtoken = "9.3.1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = { version = "0.10.64", features = ["vendored"] }
