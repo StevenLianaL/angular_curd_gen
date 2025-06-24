@@ -283,7 +283,7 @@ class ModelRegister:
     def _to_test_folder(self):
         """Copy all files to test folder"""
         shutil.copytree(str(self.output_angular_dir), "W:/projects/work/test-frontend/src/app/paper", dirs_exist_ok=True)
-        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/test_backend", dirs_exist_ok=True)
+        shutil.copytree(str(self.out_rust_dir), "W:/rustProjects/rustPeyel1", dirs_exist_ok=True)
 
 
 @dataclass

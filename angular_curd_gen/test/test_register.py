@@ -197,6 +197,38 @@ class ItemsAdmin:
     )
 
 
+class Marking(BaseModel):
+    id: int
+    examinee_id: int
+    item_code: str
+    paper_id: int
+    exam_id: int
+    first_score: str = ""
+    second_score: str = ""
+    final_score: str = ""
+    markers: str = ''
+
+
+class MarkingsAdmin:
+    model_readable_name = '打分'
+    model_fields = (
+        'id', 'examinee_id', 'item_code', 'paper_id', 'exam_id',
+        'first_score', 'second_score', 'final_score', 'markers'
+    )
+    list_display_restraint = (
+        'examinee_id', 'item_code', 'first_score'
+    )
+    list_editable_restraint = ()
+    list_filter_fields = ('examinee_id', 'item_code', 'exam_id')
+    list_sort_fields = ('examinee_id', 'exam_id')
+    model_edit_fields = ('first_score', 'second_score', 'final_score')
+    model_create_fields = ('examinee_id', 'item_code', 'paper_id', 'exam_id')
+    model_translate_fields = (
+        'ID', '考生ID', '题目编号', '试卷ID', '考试ID',
+        '初评分数', '复评分数', '终审分数',  '标记'
+    )
+
+
 def test_register_game():
     generate_whole_app(model_admin=GameInfoAdmin, model=GameInfo, app_name='game', app_readable_name='HGame',
                        db_name='game_search', db_user='test', db_pswd='test')
@@ -214,7 +246,9 @@ def test_register():
     #                    db_name='transactions', db_user='test', db_pswd='test')
     # generate_whole_app(model_admin=ProductsAdmin, model=Product, app_name='transactions', app_readable_name='产品',
     #                    db_name='transactions', db_user='test', db_pswd='test')
-    generate_whole_app(model_admin=PapersAdmin, model=Paper, app_name='paper', app_readable_name='试卷',
-                       db_name='yass', db_user='test', db_pswd='test')
+    # generate_whole_app(model_admin=PapersAdmin, model=Paper, app_name='paper', app_readable_name='试卷',
+    #                    db_name='yass', db_user='test', db_pswd='test')
+    generate_whole_app(model_admin=MarkingsAdmin, model=Marking, app_name='marking', app_readable_name='打分',
+                       db_name='peyel_admin', db_user='test', db_pswd='test')
     # generate_whole_app(model_admin=ItemsAdmin, model=Item, app_name='Item', app_readable_name='试卷',
     #                    db_name='yass', db_user='test', db_pswd='test')
